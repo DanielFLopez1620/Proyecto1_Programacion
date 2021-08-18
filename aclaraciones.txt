@@ -1,1 +1,20 @@
 Esta va a ser la estrucutura del archivo...
+1. Archivos de loggeo: Cada uno classe o categoría tendrá una propio: Admin, consultor y cliente:
+    Nombre: Menor a 30 letras
+    Contraseña: Menor a 15 letras
+    Tipo: Letra--> a(admin), c(cliente), o(consultor)
+    Cuenta: Letra --> a(activa), b(bloqueada), d(eliminada)
+    Creacion: Fecha menor a 30 letras
+2. Archivos de producto: Corresponde al inventario de productos:
+    Nombre: Producto menor a 30 letras
+    Codigo: Numero autoincremental
+    Precio: Entero $
+    Cantidad: Numero de disponibilidad de producto
+    Total ventas: Numero de conteo de veces vendidas
+3. Recibos y pagos:
+    Cliente: Nombre del cliente menor a 30 letras
+    Producto: Listado de productos comprados, menor a 30 letras cada uno
+    Cantidad: Numero de cantidad de cada producto
+    Precio individual: Entero $
+    Precio total: Numero, sumatoria de todos los precios individuales
+    Estado: Letra --> e(espera),c(cancelado),d(despachado)
