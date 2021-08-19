@@ -9,7 +9,7 @@ const int ML = 30;
 struct personal
 {
     char nombre[ML]={' '};
-    char contraseña[ML]={' '};
+    char contrasena[ML]={' '};
     char tipo = ' ';
     char cuenta = 'e';
     char fecha[ML]={' '};
@@ -18,7 +18,8 @@ struct personal
 int main()
 {
     fstream archivo;
-    personal admin;
+    personal admin,*aadmin;
+    aadmin = &admin;
     string nombre = "perfiles.txt";
     string aux;
     char date[ML]; //arreglo char para la fecha
@@ -35,12 +36,16 @@ int main()
     strcpy(admin.nombre,aux.c_str());
     cout<<"Digite una nueva contraseña: ";
     getline(cin>>ws,aux);
-    strcpy(admin.contraseña,aux.c_str());
+    strcpy(admin.contrasena,aux.c_str());
     admin.tipo = 'a';
     admin.cuenta = 'a';
     strcpy(admin.fecha,date);
-    archivo.open(nombre,ios::app | ios::binary);
-    archivo.write(admin.nombre,sizeof(admin.nombre));
+    archivo.open(nombre,ios::app);
+        archivo.write(admin.nombre,sizeof(admin.nombre));
+        archivo.write(admin.contrasena,sizeof(admin.contrasena));
+        archivo.write((char *)&admin.tipo,sizeof(admin.tipo));
+        archivo.write((char *)&admin.cuenta,sizeof(admin.cuenta));
+        archivo.write(admin.fecha,sizeof(admin.fecha));
     archivo.close();
     return 0;
 }

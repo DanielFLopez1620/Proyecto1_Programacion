@@ -10,7 +10,7 @@ const int ML = 30;
 struct personal
 {
     char nombre[ML]={' '};
-    char contraseña[ML]={' '};
+    char contrasena[ML]={' '};
     char tipo = ' ';
     char cuenta = 'e';
     char fecha[ML]={' '};
@@ -40,9 +40,8 @@ productos buscar ();
 //--DESARROLLO DEL MAIN:
 int main()
 {
-    int var;
-    char opt;
-    char *aopt;
+    int var,*avar;
+    char opt,*aopt;
     listado compras[ML];   // estrucutura para recibos
     setlocale(LC_ALL,"");  //configuración de región
     time_t rawtime;    //variable de tipo tiempo
@@ -51,7 +50,55 @@ int main()
     timeinfo = localtime(&rawtime);  //cambiar el formato a la zona configurada
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
     aopt = &opt;
+    avar = &var;
     cout<<"Logueo: "<<endl;
+    do
+    {
+        switch(opt)
+        {
+            case 'a':
+                menu_admin();
+                cout<<"Querido admin,digite su opcion: ";
+                cin>>*avar;
+                do
+                {
+                    switch(var)
+                    {
+                        case 1:
+                            cout<<"Abriendo la funcionalidad de registros..."<<endl;
+                        break;
+                        case 2:
+                            cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
+                        break;
+                        case 3:
+                        break;
+                        case 4:
+                        break;
+                        case 5:
+                        break;
+                        case 6:
+                            cout<<"Saliendo de la sesión..."<<endl;
+                        default: 
+                            cout<<"Volviendo a mostrar el menu"<<endl;
+                    }
+                } while (var!=6);
+            break;
+            case 'c':
+                menu_client();
+                cout<<"Querido cliente,digite su opcion: ";
+                cin>>*avar;
+            break;
+            case 'o':
+                menu_consul();
+                cout<<"Querido consultor,digite su opcion: ";
+                cin>>*avar;
+            break;
+            default:
+                cout<<"Opcion no valida volviendo al loggueo"<<endl;
+        }
+    } while (opt!='s');
+    
+    
     return 0;   
 }
 //--DEFINICIÓN DE FUNCIONES
@@ -97,7 +144,17 @@ void menu_consul()
 }
 void compra_producto()
 {
-    
+    /*cout<<"Ingrese el nombre del producto: "<<endl;
+    cin>>produc.nombre;
+    cout<<"Ingrese la categoria del producto: "<<endl;
+    cin>>produc.categoria;
+    cout<<"Ingrese el precio: "<<endl;
+    cin>>produc.precio;
+    cout<<"Ingrese la disponibilidad del producto: "<<endl;
+    cin>>produc.disponibilidad;
+    cout<<"Ingrese la venta del producto: "<<endl;
+    cin>>produc.ventas;
+    */
     return;
 }
 
@@ -119,23 +176,23 @@ void archivoproducto()
 }
 productos buscar (string archivo)
 {
-    /*int codigo;
+    /*int autoincremental,i=0;
     fstream tem;
-
     tem.open(archivo,ios::binary | ios::in);
-
-    while(!tem.eof()){
+    while(!tem.eof())
+    {
         tem.seekg((i)*sizeof(produc));
         tem.read((char *) &produc,sizeof(produc));
-
-        if(tem.good()){
+        if(tem.good())
+        {
             cout<<" la posicion en el archivo es: "<<i+1<<endl;
-            cout<<"nombre "<< convertToString(produc.nombre,ML)<<"categoria: "<< produc.categoria 
+            cout<<"nombre "<< convertToString(produc.nombre,ML)<<" categoria: "<< produc.categoria <<" precio "<<produc.precio <<" disponibilidad "<<produc.disponibilidad;
+            cout<<" ventas "<< produc.ventas <<" codigo "<<produc.codigo<<" "<<endl;
+            autoincremental=produc.codigo;
         }
-
         i=i+1;
-
     }  */
+    return;
 }
 string convertToString(char* arreglo, int size) //conversión de string a caracter mediante concatenación
 {
