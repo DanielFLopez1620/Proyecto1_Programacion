@@ -17,20 +17,30 @@ struct personal
 };
 struct productos{
     char nombre[ML]={' '};
-    int precio;
-    int disponibilidad;
-    int ventas;
+    char categoria={' '};
+    int precio=0;
+    int disponibilidad=0;
+    int ventas=0;
+    int codigo=0;
+};
+struct listado
+{
+    char nombre[ML]={' '};
+    int precio_ind=0;
+    int cantidad_compra=0;
 };
 //--PROTOTIPOS DE FUNCIONES:
 void menu_admin();
 void menu_client();
 void menu_consul();
+void archivoproducto ();
 //--DESARROLLO DEL MAIN:
 int main()
 {
     int var;
     char opt;
     char *aopt;
+    listado compras[ML];   // estrucutura para recibos
     setlocale(LC_ALL,"");  //configuración de región
     time_t rawtime;    //variable de tipo tiempo
     struct tm * timeinfo;  //estructura de tiempo que abarca desde segundo a mes--> tm_(type)
@@ -81,4 +91,25 @@ void menu_consul()
     cout<<"*   5) Cerrar sesión            *"<<endl;
     cout<<"*********************************"<<endl;
     return;  //return final
+}
+/*void ()
+{
+    return;
+}*/
+
+void archivoproducto()
+{
+    /*string archivo = "archivobinario.txt";
+    fstream tem;
+    tem.open(archivo.c_str(), ios::binary | ios::app);
+    if(!tem.eof())
+    {
+        tem.write((char *) &produc,sizeof(produc));
+    }
+    else 
+    {
+        cout<<"Error em la apertura de archivo"<<endl;   
+    }
+    tem.close();
+    return;*/
 }

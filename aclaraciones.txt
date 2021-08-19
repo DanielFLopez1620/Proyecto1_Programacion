@@ -7,6 +7,7 @@ Esta va a ser la estrucutura del archivo...
     Creacion: Fecha menor a 30 letras
 2. Archivos de producto: Corresponde al inventario de productos:
     Nombre: Producto menor a 30 letras
+    Categoría: Letra --> l(lacteos),j(jugos),c(carne),f(frutas),v(verduras)...
     Codigo: Numero autoincremental
     Precio: Entero $
     Cantidad: Numero de disponibilidad de producto
