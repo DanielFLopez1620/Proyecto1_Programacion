@@ -13,12 +13,16 @@ void menu_consul();
 int main()
 {
     int var;
+    char opt;
+    char *aopt;
     setlocale(LC_ALL,"");  //configuración de región
     time_t rawtime;    //variable de tipo tiempo
     struct tm * timeinfo;  //estructura de tiempo que abarca desde segundo a mes--> tm_(type)
     time(&rawtime);    //función para obtener el tiempo actual
     timeinfo = localtime(&rawtime);  //cambiar el formato a la zona configurada
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
+    aopt = &opt;
+    cout<<"Logueo: "<<endl;
     return 0;   
 }
 //--DEFINICIÓN DE FUNCIONES
