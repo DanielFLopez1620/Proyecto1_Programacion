@@ -33,7 +33,10 @@ struct listado
 void menu_admin();
 void menu_client();
 void menu_consul();
+void compra_producto();
 void archivoproducto ();
+string convertToString(char* arreglo, int size);
+productos buscar ();
 //--DESARROLLO DEL MAIN:
 int main()
 {
@@ -92,10 +95,11 @@ void menu_consul()
     cout<<"*********************************"<<endl;
     return;  //return final
 }
-/*void ()
+void compra_producto()
 {
+    
     return;
-}*/
+}
 
 void archivoproducto()
 {
@@ -112,4 +116,33 @@ void archivoproducto()
     }
     tem.close();
     return;*/
+}
+productos buscar (string archivo)
+{
+    /*int codigo;
+    fstream tem;
+
+    tem.open(archivo,ios::binary | ios::in);
+
+    while(!tem.eof()){
+        tem.seekg((i)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+
+        if(tem.good()){
+            cout<<" la posicion en el archivo es: "<<i+1<<endl;
+            cout<<"nombre "<< convertToString(produc.nombre,ML)<<"categoria: "<< produc.categoria 
+        }
+
+        i=i+1;
+
+    }  */
+}
+string convertToString(char* arreglo, int size) //conversión de string a caracter mediante concatenación
+{
+    string s = "";
+    for (int i = 0; i < size; i++)
+    {
+        s = s + arreglo[i];
+    }
+    return s;
 }
