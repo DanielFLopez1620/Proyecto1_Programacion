@@ -5,6 +5,22 @@
 #include<string.h>  
 #include<time.h>  //librería de manejo de tiempo y fechas
 using namespace std;
+//--ESTRUCUTURAS: 
+const int ML = 30;
+struct personal
+{
+    char nombre[ML]={' '};
+    char contraseña[ML]={' '};
+    char tipo = ' ';
+    char cuenta = 'e';
+    char fecha[ML]={' '};
+};
+struct productos{
+    char nombre[ML]={' '};
+    int precio;
+    int disponibilidad;
+    int ventas;
+};
 //--PROTOTIPOS DE FUNCIONES:
 void menu_admin();
 void menu_client();
