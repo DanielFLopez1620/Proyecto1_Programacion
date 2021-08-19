@@ -60,5 +60,5 @@ void menu_consul()
     cout<<"*   4) Producto más vendido     *"<<endl;
     cout<<"*   5) Cerrar sesión            *"<<endl;
     cout<<"*********************************"<<endl;
-    return;
+    return;  //return final
 }
