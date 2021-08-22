@@ -41,14 +41,19 @@ productos buscar ();
 //--DESARROLLO DEL MAIN---------------------------------------------------------------------------
 int main()
 {
-    int var,*avar,lec,*alec;
-    char opt,*aopt;
-    listado compras[ML];   // estrucutura para recibos
     setlocale(LC_ALL,"");  //configuración de región
-    time_t rawtime;    //variable de tipo tiempo
+    int var,*avar,lec,*alec;
+    char opt,*aopt,letra;
+    listado compras[ML];   // estrucutura para recibos
+    personal nuevo; //estructura de personal para nuevos usuarios
+    time_t actual;    //variable de tipo tiempo
     struct tm * timeinfo;  //estructura de tiempo que abarca desde segundo a mes--> tm_(type)
-    time(&rawtime);    //función para obtener el tiempo actual
-    timeinfo = localtime(&rawtime);  //cambiar el formato a la zona configurada
+    time(&actual);    //función para obtener el tiempo actual
+    char date[ML]; //arreglo char para la fecha
+    timeinfo = localtime(&actual);  //cambiar el formato a la zona configurada
+    string nombre = "perfiles.txt"; //nombre del archivo de usario
+    string aux;
+    fstream usuarios;
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
     alec = &lec;  // variable y puntero del menu general
     aopt = &opt;  //variable y puntero de logueo y usuarios
@@ -58,13 +63,13 @@ int main()
         menu_general();
         cout<<"Digite su opción: ";
         cin>> *alec;
-        switch(lec)
+        switch(lec)  //---switch del menu inicial
         {
             case 1:
                 cout<<"Siga los pasos para inicio de sesión: "<<endl;
                 do
                 {
-                    switch(opt)
+                    switch(opt)   //--switch de roles
                     {
                         case 'a':   //---Funcionalidades del admin---
                             menu_admin();
@@ -72,7 +77,7 @@ int main()
                             cin>>*avar;
                             do
                             {
-                                switch(var)
+                                switch(var) 
                                 {
                                     case 1:
                                         cout<<"Abriendo la funcionalidad de registros..."<<endl;
@@ -157,6 +162,38 @@ int main()
             break;
             case 2:
                 cout<<"Preparandose para crear un nuevo usuario..."<<endl;
+                usuarios.open(nombre,ios::app);
+                if(usuarios.is_open())
+                {
+                    timeinfo = localtime( &actual); //cambio de formato de tiempo
+                    strcpy(date,ctime(&actual)); //cambio a char para ser copiado en date
+                    date[10]= date[13] = '_';
+                    date[3]=date[7]=date[16]=date[19]='-';
+                    cout<<"Digite su nuevo nombre usuario :";
+                    getline(cin>>ws,aux);
+                    strcpy(nuevo.nombre,aux.c_str());
+                    cout<<"Digite una nueva contraseña: ";
+                    getline(cin>>ws,aux);
+                    strcpy(nuevo.contrasena,aux.c_str());
+                    cout<<"Digite el rol inicial (a--> admin, c-->cliente, o--> consultor)"<<endl;
+                    do
+                    {
+                        cin>>letra;
+                    } while (letra!='a' || letra!='c' || letra!='o');
+                    nuevo.tipo = letra;
+                    nuevo.cuenta = 'e';
+                    strcpy(nuevo.fecha,date);
+                    usuarios.open(nombre,ios::app);
+                        usuarios.write(nuevo.nombre,sizeof(nuevo.nombre));
+                        usuarios.write(nuevo.contrasena,sizeof(nuevo.contrasena));
+                        usuarios.write((char *)&nuevo.tipo,sizeof(nuevo.tipo));
+                        usuarios.write((char *)&nuevo.cuenta,sizeof(nuevo.cuenta));
+                        usuarios.write(nuevo.fecha,sizeof(nuevo.fecha));
+                    usuarios.close();
+                    cout<<"Usuario creado correctamente, para estar activo requiere validación de un admin...Este pendiente de esto"<<endl;
+                }
+                else
+                    cout<<"Ha ocurrido un error, no archivo ni master detectado...\nVolviendo al menu"<<endl;
             break;
             case 3:
                 cout<<"Desplegando plantilla informativa..."<<endl;
