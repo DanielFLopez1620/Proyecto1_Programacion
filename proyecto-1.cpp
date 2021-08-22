@@ -197,6 +197,17 @@ int main()
             break;
             case 3:
                 cout<<"Desplegando plantilla informativa..."<<endl;
+                cout<<"--------------------------------------------\nSOBRE PERFILES...\n--------------------------------------------"<<endl;
+                cout<<"Este es un perfil de una tienda con 3 roles \ndefinidos que corresponden a admin, cliente y consultor"<<endl;
+                cout<<"El admin tiene funciones relacionadas a\n validación de usuarios, administrar objetos, entre otros"<<endl;
+                cout<<"El cliente puede realizar compras, cancelarlas\n o pagarlas, así como ver su total"<<endl;
+                cout<<"El consultor puede buscar y listar diferentes\n productos y categorías, así como acceso a\n estadísticas de la tienda"<<endl;
+                cout<<"--------------------------------------------\nSOBRE EL LOGUEO...\n--------------------------------------------"<<endl;
+                cout<<"Para usar el programa se requiere de una cuenta\n previamente creada y validada por un admin"<<endl;
+                cout<<"Una vez creados y validados no se cambiaran\n los roles ya definidos"<<endl;
+                cout<<"Si se digita tres veces la contraseña incorrecta\n se bloqueará el usuaria hasta el desbloque \n por parte de un admin"<<endl;
+                cout<<"Solo el admin tiene los permisos para el bloque\n de cuentas y su eliminación"<<endl;
+                cout<<"--------------------------------------------"<<endl;
             break;
             case 4:
                 cout<<"Mostrando créditos..."<<endl;
