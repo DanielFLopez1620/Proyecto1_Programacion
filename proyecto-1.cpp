@@ -42,22 +42,23 @@ productos buscar ();
 int main()
 {
     setlocale(LC_ALL,"");  //configuración de región
-    int var,*avar,lec,*alec;
-    char opt,*aopt,letra;
+    int var,*avar,lec,*alec;  //punteros y variables de manejo de menu;
+    char opt,letra;  //auxiliares y apoyos en el manejo del menu;
+    bool encontrado; // booleanos del programa
     listado compras[ML];   // estrucutura para recibos
-    personal nuevo; //estructura de personal para nuevos usuarios
+    personal nuevo,registro; //estructura de personal para nuevos usuarios
     time_t actual;    //variable de tipo tiempo
     struct tm * timeinfo;  //estructura de tiempo que abarca desde segundo a mes--> tm_(type)
     time(&actual);    //función para obtener el tiempo actual
     char date[ML]; //arreglo char para la fecha
     timeinfo = localtime(&actual);  //cambiar el formato a la zona configurada
     string nombre = "perfiles.txt"; //nombre del archivo de usario
-    string aux;
-    fstream usuarios;
+    string aux,*apaux,user; //cadenas para la lectura de teclado y asignaciones
+    fstream usuarios;   // stream para el manejo de archivos
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
     alec = &lec;  // variable y puntero del menu general
-    aopt = &opt;  //variable y puntero de logueo y usuarios
     avar = &var;  // variable y puntero de menus privados
+    apaux = &aux;
     do
     {
         menu_general();
@@ -67,99 +68,119 @@ int main()
         {
             case 1:
                 cout<<"Siga los pasos para inicio de sesión: "<<endl;
-                do
+                cout<<"Digite su nombre:";
+                getline(cin>>ws,*apaux);
+                usuarios.open(nombre,ios::in | ios::binary);
+                if(usuarios.is_open())
                 {
-                    switch(opt)   //--switch de roles
+                    encontrado = false;
+                    while(!usuarios.eof())
                     {
-                        case 'a':   //---Funcionalidades del admin---
-                            menu_admin();
-                            cout<<"Querido admin,digite su opcion: ";
-                            cin>>*avar;
-                            do
-                            {
-                                switch(var) 
-                                {
-                                    case 1:
-                                        cout<<"Abriendo la funcionalidad de registros..."<<endl;
-                                    break;
-                                    case 2:
-                                        cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
-                                    break;
-                                    case 3:
-                                        cout<<"Abriendo función de administrar categorías..."<<endl;
-                                    break;
-                                    case 4:
-                                        cout<<"Abriendo función de administrar productos..."<<endl;
-                                    break;
-                                    case 5:
-                                        cout<<"Abriendo la función de despacho de compras..."<<endl;
-                                    break;
-                                    case 6:
-                                        cout<<"Saliendo de la sesión..."<<endl;
-                                    default: 
-                                        cout<<"Volviendo a mostrar el menu"<<endl;
-                                }
-                            } while (var!=6);
-                        break;
-                        case 'c':   //---Funcionalidades del cliente---
-                            menu_client();
-                            cout<<"Querido cliente,digite su opcion: ";
-                            cin>>*avar;
-                            do
-                            {
-                                switch(var)
-                                {
-                                    case 1:
-                                        cout<<"Eligio realizar una compra..."<<endl;
-                                    break;
-                                    case 2:
-                                        cout<<"Eligio la opción de cancelar compra..."<<endl;
-                                    break;
-                                    case 3:
-                                        cout<<"Calculando el total de la compra..."<<endl;
-                                    break;
-                                    case 4:
-                                        cout<<"Mostrando la cantidad de productos comprados..."<<endl;
-                                    break;
-                                    case 5:
-                                        cout<<"Saliendo de la sesión..."<<endl;
-                                    default: 
-                                        cout<<"Volviendo a mostrar el menu"<<endl;
-                                }
-                            } while (var!=5);
-                        break;
-                        case 'o':   //---Funcionalidades del consultor---
-                            menu_consul();
-                            cout<<"Querido consultor,digite su opcion: ";
-                            cin>>*avar;
-                            do
-                            {
-                                switch(var)
-                                {
-                                    case 1:
-                                        cout<<"Cargando registros para listar productos..."<<endl;
-                                    break;
-                                    case 2:
-                                        cout<<"Cargando regristros de los clientes existentes..."<<endl;
-                                    break;
-                                    case 3:
-                                        cout<<"Calculando el total de ventas del programa..."<<endl;
-                                    break;
-                                    case 4:
-                                        cout<<"Buscando el producto más vendido..."<<endl;
-                                    break;
-                                    case 5:
-                                        cout<<"Saliendo de la sesión..."<<endl;
-                                    default: 
-                                        cout<<"Volviendo a mostrar el menu"<<endl;
-                                }
-                            } while (var!=5);
-                        break;
-                        default:
-                            cout<<"Opcion no valida volviendo al loggueo"<<endl;
+                        usuarios.read(registro.nombre,sizeof(registro.nombre));
+                        usuarios.read(registro.contrasena,sizeof(registro.contrasena));
+                        usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                        usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                        usuarios.read(registro.fecha,sizeof(registro.fecha));
+                        user = convertToString(registro.nombre,ML);
+                        if (user==aux)
+                            encontrado = true;
                     }
-                } while (opt!='s');
-            break;
+                    do
+                    {
+                        switch(opt)   //--switch de roles
+                        {
+                            case 'a':   //---Funcionalidades del admin---
+                                menu_admin();
+                                cout<<"Querido admin,digite su opcion: ";
+                                cin>>*avar;
+                                do
+                                {
+                                    switch(var) 
+                                    {
+                                        case 1:
+                                            cout<<"Abriendo la funcionalidad de registros..."<<endl;
+                                        break;
+                                        case 2:
+                                            cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
+                                        break;
+                                        case 3:
+                                            cout<<"Abriendo función de administrar categorías..."<<endl;
+                                        break;
+                                        case 4:
+                                            cout<<"Abriendo función de administrar productos..."<<endl;
+                                        break;
+                                        case 5:
+                                            cout<<"Abriendo la función de despacho de compras..."<<endl;
+                                        break;
+                                        case 6:
+                                            cout<<"Saliendo de la sesión..."<<endl;
+                                        default: 
+                                            cout<<"Volviendo a mostrar el menu"<<endl;
+                                    }
+                                } while (var!=6);
+                            break;
+                            case 'c':   //---Funcionalidades del cliente---
+                                menu_client();
+                                cout<<"Querido cliente,digite su opcion: ";
+                                cin>>*avar;
+                                do
+                                {
+                                    switch(var)
+                                    {
+                                        case 1:
+                                            cout<<"Eligio realizar una compra..."<<endl;
+                                        break;
+                                        case 2:
+                                            cout<<"Eligio la opción de cancelar compra..."<<endl;
+                                        break;
+                                        case 3:
+                                            cout<<"Calculando el total de la compra..."<<endl;
+                                        break;
+                                        case 4:
+                                            cout<<"Mostrando la cantidad de productos comprados..."<<endl;
+                                        break;
+                                        case 5:
+                                            cout<<"Saliendo de la sesión..."<<endl;
+                                        default: 
+                                            cout<<"Volviendo a mostrar el menu"<<endl;
+                                    }
+                                } while (var!=5);
+                            break;
+                            case 'o':   //---Funcionalidades del consultor---
+                                menu_consul();
+                                cout<<"Querido consultor,digite su opcion: ";
+                                cin>>*avar;
+                                do
+                                {
+                                    switch(var)
+                                    {
+                                        case 1:
+                                            cout<<"Cargando registros para listar productos..."<<endl;
+                                        break;
+                                        case 2:
+                                            cout<<"Cargando regristros de los clientes existentes..."<<endl;
+                                        break;
+                                        case 3:
+                                            cout<<"Calculando el total de ventas del programa..."<<endl;
+                                        break;
+                                        case 4:
+                                            cout<<"Buscando el producto más vendido..."<<endl;
+                                        break;
+                                        case 5:
+                                            cout<<"Saliendo de la sesión..."<<endl;
+                                        default: 
+                                            cout<<"Volviendo a mostrar el menu"<<endl;
+                                    }
+                                } while (var!=5);
+                            break;
+                            default:
+                                cout<<"Opcion no valida volviendo al loggueo"<<endl;
+                        }
+                    } while (opt!='s');
+                break;
+                }
+                else
+                    cout<<"Volviendo al menú... ha ocurrido un error con el archivo de registrados..."<<endl;
             case 2:
                 cout<<"Preparandose para crear un nuevo usuario..."<<endl;
                 usuarios.open(nombre,ios::app);
