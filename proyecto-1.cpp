@@ -250,7 +250,7 @@ int main()
                     do
                     {
                         cin>>letra;
-                    } while (letra!='a' || letra!='c' || letra!='o');
+                    } while (letra!='a' && letra!='c' && letra!='o');
                     nuevo.tipo = letra;
                     nuevo.cuenta = 'e';
                     strcpy(nuevo.fecha,date);
