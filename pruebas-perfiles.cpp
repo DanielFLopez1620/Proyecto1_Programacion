@@ -47,7 +47,7 @@ int main()
                     archivo.read(lectura[con].fecha,sizeof(lectura[con].fecha));
                     con++;
                 }
-                for(int i=0;i<=con;i++)
+                for(int i=0;i<con;i++)
                 {
                     cout<<"Nombre: "<<lectura[i].nombre<<endl;
                     cout<<"Contraseña: "<<lectura[i].contrasena<<endl;
