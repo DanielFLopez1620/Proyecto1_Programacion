@@ -40,7 +40,7 @@ int main()
     admin.tipo = 'a';
     admin.cuenta = 'a';
     strcpy(admin.fecha,date);
-    archivo.open(nombre,ios::app);
+    archivo.open(nombre,ios::out | ios::binary | ios::app);
         archivo.write(admin.nombre,sizeof(admin.nombre));
         archivo.write(admin.contrasena,sizeof(admin.contrasena));
         archivo.write((char *)&admin.tipo,sizeof(admin.tipo));

@@ -233,7 +233,7 @@ int main()
                 break;
             case 2:
                 cout<<"Preparandose para crear un nuevo usuario..."<<endl;
-                usuarios.open(nombre,ios::app);
+                usuarios.open(nombre,ios::app |ios::out |ios::binary);
                 if(usuarios.is_open())
                 {
                     timeinfo = localtime( &actual); //cambio de formato de tiempo
