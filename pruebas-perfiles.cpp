@@ -2,6 +2,7 @@
 #include<iostream>
 #include<fstream>
 #include<locale.h>
+#include<string.h>
 using namespace std;
 //--CONSTANTES DEL PROGRAMA:
 const int ML = 30;
@@ -26,6 +27,7 @@ int main()
     personal revision, lectura[lec];
     string nombre = "perfiles.txt";
     string aux,convertido;
+    char buscado[ML]={' '};
     char letra;
     long direccion;
     do
@@ -50,7 +52,9 @@ int main()
                     archivo.read((char *)&lectura[con].cuenta,sizeof(lectura[con].cuenta));
                     archivo.read(lectura[con].fecha,sizeof(lectura[con].fecha));
                     convertido = convertToString(lectura[con].nombre,ML);
-                    cout<<aux<<" "<<convertido<<"-"<<endl;   //--CORREGIR ACÁ
+                    cout<<aux<<" "<<convertido<<"-"<<endl;   
+                    strcpy(buscado,aux.c_str());
+                    aux = convertToString(buscado,ML);
                     if(aux == convertido)
                     {
                         cout<<"Encontrado..."<<endl; 

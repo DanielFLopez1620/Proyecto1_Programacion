@@ -58,7 +58,8 @@ int main()
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
     alec = &lec;  // variable y puntero del menu general
     avar = &var;  // variable y puntero de menus privados
-    apaux = &aux;
+    apaux = &aux; // auxiliar para nombres
+    char buscado[ML]={'  '};
     do
     {
         menu_general();
@@ -82,12 +83,13 @@ int main()
                         usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
                         usuarios.read(registro.fecha,sizeof(registro.fecha));
                         user = convertToString(registro.nombre,ML);
+                        strcpy(buscado,aux.c_str());  // paso a arreglo para igualar tamanios
+                        aux = convertToString(buscado,ML);  // convertir a string para permitir comparación
                         if (user==aux)
                         {
                             encontrado = true;
                             break;
                         }
-                            
                     }
                     usuarios.close();
                     if(encontrado)  //verificación de encontrado del usuario
@@ -99,6 +101,8 @@ int main()
                         {
                             cout<<"Digite la contraseña del usuario "<<user<<": ";
                             cin>> aux;
+                            strcpy(buscado,aux.c_str());  // conversión para mantener tamanios
+                            aux = convertToString(buscado,ML);  // convertir a string para facilidad de comparacion
                             if(password == aux)
                             {
                                 correcta = true;
@@ -214,6 +218,8 @@ int main()
                                 usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
                                 usuarios.read(registro.fecha,sizeof(registro.fecha));
                                 aux = convertToString(registro.nombre,ML);
+                                strcpy(buscado,aux.c_str());
+                                aux = convertToString(buscado,ML);
                                 if(user == aux)  // buscar nuevamente la concidencia
                                 {
                                     encontrado=true;
