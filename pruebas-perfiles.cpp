@@ -73,19 +73,6 @@ int main()
                 cout<<"Ha ocurrido un problema accediendo al archivo"<<endl;
             system("pause");
             archivo.close();
-            /*archivo.open(nombre,ios::binary | ios::out);
-            if(archivo.is_open())
-            {
-                cout<<"Digite el cambio en cuenta: ";
-                cin>> letra;
-                archivo.seekp(direccion-(sizeof(lectura[con].fecha)+sizeof(lectura[con].cuenta)));
-                lectura[con].cuenta = letra;
-                archivo.write((char *)&lectura[con].cuenta,sizeof(lectura[con].cuenta));
-                cout<<"Asignación completada..."<<endl;
-            }
-            else
-                cout<<" Ha ocurrido un error..."<<endl;
-            archivo.close();*/
             break;
         case 2:
             cout<<"Leyendo archivo..."<<endl;

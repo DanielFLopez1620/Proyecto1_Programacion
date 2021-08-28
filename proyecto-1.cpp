@@ -46,7 +46,7 @@ int main()
     char opt,letra;  //auxiliares y apoyos en el manejo del menu;
     bool encontrado,correcta; // booleanos del programa
     listado compras[ML];   // estrucutura para recibos
-    personal nuevo,registro; //estructura de personal para nuevos usuarios
+    personal nuevo,registro,enlista[ML]; //estructura de personal para nuevos usuarios
     time_t actual;    //variable de tipo tiempo
     struct tm * timeinfo;  //estructura de tiempo que abarca desde segundo a mes--> tm_(type)
     time(&actual);    //función para obtener el tiempo actual
@@ -117,7 +117,7 @@ int main()
                             {
                                 switch(opt)   //--switch de roles
                                 {
-                                    case 'a':   //---Funcionalidades del admin---
+                                    case 'a':   //----------------------------Funcionalidades del admin--------------------------------------
                                         menu_admin();
                                         cout<<"Querido admin,digite su opcion: ";
                                         cin>>*avar;
@@ -127,6 +127,38 @@ int main()
                                             {
                                                 case 1:
                                                     cout<<"Abriendo la funcionalidad de registros..."<<endl;
+                                                    usuarios.open(nombre,ios::in | ios::binary);
+                                                    con = 0;
+                                                    letra = 'e';
+                                                    if(usuarios.is_open())
+                                                    {
+                                                        while(!usuarios.eof())
+                                                        {
+                                                            usuarios.read(enlista[con].nombre,sizeof(enlista[con].nombre));
+                                                            usuarios.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
+                                                            usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
+                                                            usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
+                                                            usuarios.read(enlista[con].fecha,sizeof(enlista[con].fecha));
+                                                            if(enlista[con].cuenta==letra)
+                                                                con++;
+                                                        }
+                                                        if(con>0)
+                                                        {
+                                                            cout<<"Desplegando cuentas en espera:"<<endl;
+                                                            for(int i=0;i<con;i++)
+                                                            {
+                                                                cout<<"Nombre: "<<enlista[i].nombre<<endl;
+                                                                cout<<"Contraseña: "<<enlista[i].contrasena<<endl;
+                                                                cout<<"Tipo: "<<enlista[i].tipo<<endl;
+                                                                cout<<"Cuenta: "<<enlista[i].cuenta<<endl;
+                                                                cout<<"Creación: "<<enlista[i].fecha<<endl;
+                                                                cout<<endl;
+                                                            }
+                                                        else
+                                                            cout<<"Ha ocurrido un problema al acceder al archivo..."<<endl;
+                                                    }
+                                                    else
+                                                        cout<<"Ha ocurrido un problema con la lectura de datos..."<<endl;
                                                 break;
                                                 case 2:
                                                     cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
@@ -147,7 +179,7 @@ int main()
                                             }
                                         } while (var!=6);
                                     break;
-                                    case 'c':   //---Funcionalidades del cliente---
+                                    case 'c':   //---------------------------------Funcionalidades del cliente----------------------------------
                                         menu_client();
                                         cout<<"Querido cliente,digite su opcion: ";
                                         cin>>*avar;
@@ -174,7 +206,7 @@ int main()
                                             }
                                         } while (var!=5);
                                     break;
-                                    case 'o':   //---Funcionalidades del consultor---
+                                    case 'o':   //----------------------------------Funcionalidades del consultor-------------------------------
                                         menu_consul();
                                         cout<<"Querido consultor,digite su opcion: ";
                                         cin>>*avar;
