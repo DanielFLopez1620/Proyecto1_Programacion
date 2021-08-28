@@ -59,7 +59,8 @@ int main()
     alec = &lec;  // variable y puntero del menu general
     avar = &var;  // variable y puntero de menus privados
     apaux = &aux; // auxiliar para nombres
-    char buscado[ML]={'  '};
+    char buscado[ML]={'  '};  // vector auxiliar para compatibilidad con registros
+    long direccion;
     do
     {
         menu_general();
@@ -87,7 +88,7 @@ int main()
                         aux = convertToString(buscado,ML);  // convertir a string para permitir comparación
                         if (user==aux)
                         {
-                            encontrado = true;
+                            encontrado = true;  // se ha encontrado coincidencia de nombre
                             break;
                         }
                     }
@@ -105,11 +106,11 @@ int main()
                             aux = convertToString(buscado,ML);  // convertir a string para facilidad de comparacion
                             if(password == aux)
                             {
-                                correcta = true;
+                                correcta = true;  // añadir que se ha encontrado coincidencia
                                 break;
                             }
                             con++;
-                        } while (con<=3);
+                        } while (con<=3); // si excede los tres intentos se sabra
                         if(correcta)  // verificación de la contraseña correcta
                         {
                             do
@@ -218,16 +219,20 @@ int main()
                                 usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
                                 usuarios.read(registro.fecha,sizeof(registro.fecha));
                                 aux = convertToString(registro.nombre,ML);
-                                strcpy(buscado,aux.c_str());
-                                aux = convertToString(buscado,ML);
+                                strcpy(buscado,aux.c_str());  // conversión de apoyo
+                                aux = convertToString(buscado,ML);  // paso a string para mejor comparación
                                 if(user == aux)  // buscar nuevamente la concidencia
                                 {
                                     encontrado=true;
+                                    direccion = usuarios.tellp();  //asignar la dirección actual en registros
+                                    letra = 'b'; // cambio de letra para bloqueo de usuarios
+                                    usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
+                                    registro.cuenta = letra; 
+                                    usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
                                     break;
                                 }
                             }
-                            //se prodecede al bloque del usuario en el parámetro cuenta
-                            //--PENDIENTE DEFINIR BLOQUEO
+                            cout<<"Su usuario ha sido bloqueado, contacte al admin en caso de requerir desbloque"<<endl;
                             usuarios.close();
                         }
                     }
