@@ -127,25 +127,25 @@ int main()
                                             {
                                                 case 1:
                                                     cout<<"Abriendo la funcionalidad de registros..."<<endl;
-                                                    usuarios.open(nombre,ios::in | ios::binary);
+                                                    usuarios.open(nombre,ios::in | ios::binary); // abrir archivo en modo lectura
                                                     con = 0;
-                                                    letra = 'e';
-                                                    if(usuarios.is_open())
+                                                    letra = 'e'; // e--> en espera
+                                                    if(usuarios.is_open()) //verificación de apertura de archivo
                                                     {
-                                                        while(!usuarios.eof())
+                                                        while(!usuarios.eof())  // mientras el archivo no termine
                                                         {
                                                             usuarios.read(enlista[con].nombre,sizeof(enlista[con].nombre));
                                                             usuarios.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
                                                             usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
                                                             usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
                                                             usuarios.read(enlista[con].fecha,sizeof(enlista[con].fecha));
-                                                            if(enlista[con].cuenta==letra)
+                                                            if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
                                                                 con++;
                                                         }
                                                         if(con>0)
                                                         {
                                                             cout<<"Desplegando cuentas en espera:"<<endl;
-                                                            for(int i=0;i<con;i++)
+                                                            for(int i=0;i<con;i++)  // ciclo de mostrado de recopilaciones
                                                             {
                                                                 cout<<"Nombre: "<<enlista[i].nombre<<endl;
                                                                 cout<<"Contraseña: "<<enlista[i].contrasena<<endl;
@@ -154,6 +154,7 @@ int main()
                                                                 cout<<"Creación: "<<enlista[i].fecha<<endl;
                                                                 cout<<endl;
                                                             }
+                                                        }
                                                         else
                                                             cout<<"Ha ocurrido un problema al acceder al archivo..."<<endl;
                                                     }
