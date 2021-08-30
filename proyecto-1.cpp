@@ -37,7 +37,7 @@ void menu_consul();
 void compra_producto();
 void archivoproducto ();
 string convertToString(char* arreglo, int size);
-productos buscar ();
+productos buscar();
 void cambios_cuenta(string nombre,personal enlista[],char letra,int &con, long ubicaciones[],char cambio);
 //--DESARROLLO DEL MAIN---------------------------------------------------------------------------
 int main()
@@ -45,7 +45,7 @@ int main()
     setlocale(LC_ALL,"");  //configuración de región
     int var,*avar,lec,*alec,con=0;  //punteros y variables de manejo de menu;
     char opt,letra,cambio;  //auxiliares y apoyos en el manejo del menu;
-    bool encontrado,correcta; // booleanos del programa
+    bool encontrado,correcta,permitido,borrada; // booleanos del programa
     listado compras[ML];   // estrucutura para recibos
     personal nuevo,registro,enlista[ML]; //estructura de personal para nuevos usuarios
     time_t actual;    //variable de tipo tiempo
@@ -60,7 +60,7 @@ int main()
     alec = &lec;  // variable y puntero del menu general
     avar = &var;  // variable y puntero de menus privados
     apaux = &aux; // auxiliar para nombres
-    char buscado[ML]={'  '};  // vector auxiliar para compatibilidad con registros
+    char buscado[ML]={' '};  // vector auxiliar para compatibilidad con registros
     long direccion,ubicaciones[ML];  // arreglo de direcciones para cambio
     do
     {
@@ -73,16 +73,17 @@ int main()
                 cout<<"Siga los pasos para inicio de sesión: "<<endl;
                 cout<<"Digite su nombre:";
                 getline(cin>>ws,*apaux);  //lectura de nombre
+                permitido = true;
                 usuarios.open(nombre,ios::in | ios::binary);  // apertura de archivo en modo binario
                 if(usuarios.is_open())
                 {
-                    encontrado = false;
+                    encontrado= borrada = false;
                     while(!usuarios.eof())
                     {
                         usuarios.read(registro.nombre,sizeof(registro.nombre));
                         usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
                         usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                        usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                        usuarios.read((char *)&registro.cuenta,sizeof(registro.cuenta));
                         usuarios.read(registro.fecha,sizeof(registro.fecha));
                         user = convertToString(registro.nombre,ML);
                         strcpy(buscado,aux.c_str());  // paso a arreglo para igualar tamanios
@@ -94,7 +95,9 @@ int main()
                         }
                     }
                     usuarios.close();
-                    if(encontrado)  //verificación de encontrado del usuario
+                    if(registro.cuenta == 'b' || registro.cuenta=='d')
+                        permitido = false;
+                    if(encontrado && permitido)  //verificación de encontrado del usuario
                     {
                         password = convertToString(registro.contrasena,ML);
                         con = 0; 
@@ -134,14 +137,14 @@ int main()
                                                     con = 0;
                                                     letra = 'e'; // e--> en espera
                                                     cambio = 'a';
-                                                    cambios_cuenta(nombre,enlista,letra,con,ubicaciones,cambio);
+                                                    cambios_cuenta(nombre,enlista,letra,con,ubicaciones,cambio); // cambio para activación de cuenta
                                                 break;
                                                 case 2:
                                                     cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
                                                     con = 0;
                                                     letra = 'b'; // b--> bloqueado
                                                     cambio = 'a';
-                                                    cambios_cuenta(nombre,enlista,letra,con,ubicaciones,cambio);
+                                                    cambios_cuenta(nombre,enlista,letra,con,ubicaciones,cambio);  // cambio para desbloqueo de cuenta 
                                                 break;
                                                 case 3:
                                                     cout<<"Abriendo función de administrar categorías..."<<endl;
@@ -249,7 +252,13 @@ int main()
                         }
                     }
                     else
-                        cout<<"Usuario no encontrado...\nVolviendo al menu"<<endl;
+                    {
+                        if(registro.cuenta == 'b')
+                            cout<<"Su cuenta se encuentra aun bloqueada, contacte al admin para el desbloque"<<endl;
+                        else
+                            cout<<"Usuario no encontrado, posiblemente no se ha creado o fue borrado...\nVolviendo al menu"<<endl;
+                    }
+                        
                 }
                 else
                     cout<<"Volviendo al menú...nHa ocurrido un error con el archivo de registrados..."<<endl;
@@ -405,6 +414,7 @@ void archivoproducto()
 }
 productos buscar (string archivo)
 {
+    productos ejemplo;  //borrar para después
     /*int autoincremental,i=0;
     fstream tem;
     tem.open(archivo,ios::binary | ios::in);
@@ -421,7 +431,7 @@ productos buscar (string archivo)
         }
         i=i+1;
     }  */
-    return;
+    return ejemplo;
 }
 string convertToString(char* arreglo, int size) //conversión de string a caracter mediante concatenación
 {
