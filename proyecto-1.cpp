@@ -53,7 +53,7 @@ int main()
     char date[ML]; //arreglo char para la fecha
     timeinfo = localtime(&actual);  //cambiar el formato a la zona configurada
     string nombre = "perfiles.txt"; //nombre del archivo de usario
-    string aux,*apaux,user,password; //cadenas para la lectura de teclado y asignaciones
+    string aux,*apaux,user,password,persona; //cadenas para la lectura de teclado y asignaciones
     fstream usuarios;   // stream para el manejo de archivos
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
     alec = &lec;  // variable y puntero del menu general
@@ -113,12 +113,15 @@ int main()
                         } while (con<=3); // si excede los tres intentos se sabra
                         if(correcta)  // verificación de la contraseña correcta
                         {
+                            opt =registro.tipo;
                             do
                             {
                                 switch(opt)   //--switch de roles
                                 {
                                     case 'a':   //----------------------------Funcionalidades del admin--------------------------------------
                                         menu_admin();
+                                        persona = convertToString(registro.nombre,ML);
+                                        cout<<"Bienvenido :"<< persona<<endl;
                                         cout<<"Querido admin,digite su opcion: ";
                                         cin>>*avar;
                                         do
@@ -148,18 +151,23 @@ int main()
                                                             for(int i=0;i<con;i++)  // ciclo de mostrado de recopilaciones
                                                             {
                                                                 cout<<"Nombre: "<<enlista[i].nombre<<endl;
-                                                                cout<<"Contraseña: "<<enlista[i].contrasena<<endl;
+                                                                cout<<"Contraseña:*********************** "<<endl;
                                                                 cout<<"Tipo: "<<enlista[i].tipo<<endl;
                                                                 cout<<"Cuenta: "<<enlista[i].cuenta<<endl;
                                                                 cout<<"Creación: "<<enlista[i].fecha<<endl;
                                                                 cout<<endl;
                                                             }
+                                                            cout<<"¿Qué desea relizar?\n1)Aceptar todos\n2)Ignorar todos\n3)Aceptar por nombre"<<endl;
+                                                            cin>>*alec;
                                                         }
+                                                        else if (con==0)
+                                                            cout<<"No hay usuarios o personal en lista de espera"<<endl;
                                                         else
                                                             cout<<"Ha ocurrido un problema al acceder al archivo..."<<endl;
                                                     }
                                                     else
                                                         cout<<"Ha ocurrido un problema con la lectura de datos..."<<endl;
+                                                    usuarios.close();
                                                 break;
                                                 case 2:
                                                     cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
