@@ -3,7 +3,7 @@ Esta va a ser la estrucutura del archivo...
     Nombre: Menor a 30 letras
     Contraseña: Menor a 15 letras
     Tipo: Letra--> a(admin), c(cliente), o(consultor)
-    Cuenta: Letra --> a(activa), b(bloqueada), d(eliminada), e(espera)
+    Cuenta: Letra --> a(activa), b(bloqueada), d(eliminada), e(espera), c(cambio)
     Creacion: Fecha menor a 30 letras
 2. Archivos de producto: Corresponde al inventario de productos:
     Nombre: Producto menor a 30 letras

@@ -38,12 +38,13 @@ void compra_producto();
 void archivoproducto ();
 string convertToString(char* arreglo, int size);
 productos buscar ();
+void cambios_cuenta(string nombre,personal enlista[],char letra,int &con, long ubicaciones[],char cambio);
 //--DESARROLLO DEL MAIN---------------------------------------------------------------------------
 int main()
 {
     setlocale(LC_ALL,"");  //configuración de región
     int var,*avar,lec,*alec,con=0;  //punteros y variables de manejo de menu;
-    char opt,letra;  //auxiliares y apoyos en el manejo del menu;
+    char opt,letra,cambio;  //auxiliares y apoyos en el manejo del menu;
     bool encontrado,correcta; // booleanos del programa
     listado compras[ML];   // estrucutura para recibos
     personal nuevo,registro,enlista[ML]; //estructura de personal para nuevos usuarios
@@ -60,7 +61,7 @@ int main()
     avar = &var;  // variable y puntero de menus privados
     apaux = &aux; // auxiliar para nombres
     char buscado[ML]={'  '};  // vector auxiliar para compatibilidad con registros
-    long direccion;
+    long direccion,ubicaciones[ML];  // arreglo de direcciones para cambio
     do
     {
         menu_general();
@@ -130,47 +131,17 @@ int main()
                                             {
                                                 case 1:
                                                     cout<<"Abriendo la funcionalidad de registros..."<<endl;
-                                                    usuarios.open(nombre,ios::in | ios::binary); // abrir archivo en modo lectura
                                                     con = 0;
                                                     letra = 'e'; // e--> en espera
-                                                    if(usuarios.is_open()) //verificación de apertura de archivo
-                                                    {
-                                                        while(!usuarios.eof())  // mientras el archivo no termine
-                                                        {
-                                                            usuarios.read(enlista[con].nombre,sizeof(enlista[con].nombre));
-                                                            usuarios.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
-                                                            usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
-                                                            usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
-                                                            usuarios.read(enlista[con].fecha,sizeof(enlista[con].fecha));
-                                                            if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
-                                                                con++;
-                                                        }
-                                                        if(con>0)
-                                                        {
-                                                            cout<<"Desplegando cuentas en espera:"<<endl;
-                                                            for(int i=0;i<con;i++)  // ciclo de mostrado de recopilaciones
-                                                            {
-                                                                cout<<"Nombre: "<<enlista[i].nombre<<endl;
-                                                                cout<<"Contraseña:*********************** "<<endl;
-                                                                cout<<"Tipo: "<<enlista[i].tipo<<endl;
-                                                                cout<<"Cuenta: "<<enlista[i].cuenta<<endl;
-                                                                cout<<"Creación: "<<enlista[i].fecha<<endl;
-                                                                cout<<endl;
-                                                            }
-                                                            cout<<"¿Qué desea relizar?\n1)Aceptar todos\n2)Ignorar todos\n3)Aceptar por nombre"<<endl;
-                                                            cin>>*alec;
-                                                        }
-                                                        else if (con==0)
-                                                            cout<<"No hay usuarios o personal en lista de espera"<<endl;
-                                                        else
-                                                            cout<<"Ha ocurrido un problema al acceder al archivo..."<<endl;
-                                                    }
-                                                    else
-                                                        cout<<"Ha ocurrido un problema con la lectura de datos..."<<endl;
-                                                    usuarios.close();
+                                                    cambio = 'a';
+                                                    cambios_cuenta(nombre,enlista,letra,con,ubicaciones,cambio);
                                                 break;
                                                 case 2:
                                                     cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
+                                                    con = 0;
+                                                    letra = 'b'; // e--> en espera
+                                                    cambio = 'a';
+                                                    cambios_cuenta(nombre,enlista,letra,con,ubicaciones,cambio);
                                                 break;
                                                 case 3:
                                                     cout<<"Abriendo función de administrar categorías..."<<endl;
@@ -460,4 +431,62 @@ string convertToString(char* arreglo, int size) //conversión de string a caract
         s = s + arreglo[i];
     }
     return s;
+}
+void cambios_cuenta(string nombre,personal enlista[],char letra,int &con, long ubicaciones[],char cambio)
+{
+    int elec;
+    fstream usuarios;
+    usuarios.open(nombre,ios::in | ios::binary |ios::out);  // abrir el archivo en los tres modos
+    if(usuarios.is_open()) //verificación de apertura de archivo
+    {
+        while(!usuarios.eof())  // mientras el archivo no termine
+        {
+            usuarios.read(enlista[con].nombre,sizeof(enlista[con].nombre));
+            usuarios.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
+            usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
+            usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
+            usuarios.read(enlista[con].fecha,sizeof(enlista[con].fecha));
+            if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
+                con++;
+        }
+        if(con>0)
+        {
+            cout<<"Desplegando cuentas en espera:"<<endl;
+            for(int i=0;i<con;i++)  // ciclo de mostrado de recopilaciones
+            {
+                cout<<"Nombre: "<<enlista[i].nombre<<endl;
+                cout<<"Contraseña:*********************** "<<endl;
+                cout<<"Tipo: "<<enlista[i].tipo<<endl;
+                cout<<"Cuenta: "<<enlista[i].cuenta<<endl;
+                cout<<"Creación: "<<enlista[i].fecha<<endl;
+                cout<<endl;
+            }
+            cout<<"¿Qué desea relizar?\n1)Aceptar todos\n2)Ignorar todos\n3)Aceptar por nombre\n4)Salir"<<endl;
+            cin>>elec;
+            switch (elec)
+            {
+            case 1:
+                cout<<"Validando el cambio para todos los usuarios..."<<endl;                    
+                cout<<"Realizado..."<<endl;
+                break;
+            case 2:
+                cout<<"Recibido,\nSe han ignorado"<<con<<"usuarios, se volverán a mostar en posterior intentos...\n Volviendo al menu..."<<endl;
+                break;
+            case 3:                    
+                /* code */
+                break;
+            default:
+                cout<<"Volviendo al menu, opcion no valida digitada..."<<endl;
+                break;
+            }
+        }
+        else if (con==0)
+            cout<<"No hay usuarios o personal en lista de espera"<<endl;
+        else
+            cout<<"Ha ocurrido un problema al acceder al archivo..."<<endl;
+    }
+    else
+        cout<<"Ha ocurrido un problema con la lectura de datos..."<<endl;
+    usuarios.close();
+    return;
 }
