@@ -139,7 +139,7 @@ int main()
                                                 case 2:
                                                     cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
                                                     con = 0;
-                                                    letra = 'b'; // e--> en espera
+                                                    letra = 'b'; // b--> bloqueado
                                                     cambio = 'a';
                                                     cambios_cuenta(nombre,enlista,letra,con,ubicaciones,cambio);
                                                 break;
@@ -435,6 +435,8 @@ string convertToString(char* arreglo, int size) //conversión de string a caract
 void cambios_cuenta(string nombre,personal enlista[],char letra,int &con, long ubicaciones[],char cambio)
 {
     int elec;
+    string buscar,comparar;
+    char conversor[ML];
     fstream usuarios;
     usuarios.open(nombre,ios::in | ios::binary |ios::out);  // abrir el archivo en los tres modos
     if(usuarios.is_open()) //verificación de apertura de archivo
@@ -466,14 +468,33 @@ void cambios_cuenta(string nombre,personal enlista[],char letra,int &con, long u
             switch (elec)
             {
             case 1:
-                cout<<"Validando el cambio para todos los usuarios..."<<endl;                    
+                cout<<"Validando el cambio para todos los usuarios..."<<endl;  
+                for(int c=0;c<con;c++)
+                {
+                    usuarios.seekp(ubicaciones[c]-(sizeof(enlista[c].fecha)+sizeof(enlista[c].cuenta)));
+                    enlista[c].cuenta = cambio;
+                    usuarios.write((char *)&enlista[c].cuenta,sizeof(enlista[c].cuenta));
+                }                  
                 cout<<"Realizado..."<<endl;
                 break;
             case 2:
                 cout<<"Recibido,\nSe han ignorado"<<con<<"usuarios, se volverán a mostar en posterior intentos...\n Volviendo al menu..."<<endl;
                 break;
             case 3:                    
-                /* code */
+                cout<<"Digite el nombre a aceptar: "<<endl;
+                cin>>buscar;
+                strcpy(conversor,buscar.c_str());
+                buscar = convertToString(conversor,ML);
+                for(int b=0;b<con;b++)
+                {
+                    comparar = convertToString(enlista[b].nombre,ML);
+                    if (comparar == buscar)
+                    {
+                        usuarios.seekp(ubicaciones[b]-(sizeof(enlista[b].fecha)+sizeof(enlista[b].cuenta)));
+                        enlista[b].cuenta = cambio;
+                        usuarios.write((char *)&enlista[b].cuenta,sizeof(enlista[b].cuenta));
+                    }
+                }
                 break;
             default:
                 cout<<"Volviendo al menu, opcion no valida digitada..."<<endl;
