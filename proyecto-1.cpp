@@ -157,7 +157,7 @@ int main()
                                                     break;
                                                 default: 
                                                     cout<<"Volviendo a mostrar el menu"<<endl;
-                                                    //break;
+                                                    break;
                                             }
                                             menu_admin();
                                             cout<<"Digite su opción, admin: "<<endl;
@@ -279,7 +279,7 @@ int main()
                 break;
             case 2:
                 cout<<"Preparandose para crear un nuevo usuario..."<<endl;
-                generar.open(nombre,ios::out | ios::binary | ios::app);
+                generar.open(nombre,ios::out | ios::app);
                 if(generar.is_open())
                 {
                     timeinfo = localtime( &actual); //cambio de formato de tiempo
@@ -463,7 +463,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     string buscar,comparar;
     char conversor[ML];
     fstream busqueda;
-    busqueda.open(nombre,ios::binary| ios::in | ios::out);  // abrir el archivo en los tres modos
+    busqueda.open(nombre,ios::binary| ios::in);  // abrir el archivo en modo lectura
     if(busqueda.is_open()) //verificación de apertura de archivo
     {
         while(!busqueda.eof())  // mientras el archivo no termine
@@ -473,9 +473,12 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             busqueda.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
             busqueda.read((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
             busqueda.read(enlista[con].fecha,sizeof(enlista[con].fecha));
+            ubicaciones[con] = busqueda.tellp(); // guardado de posición para cambio
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
                 con++;
         }
+        busqueda.close();
+        busqueda.open(nombre,ios::binary | ios::out);  // archivo en modo escritura
         if(con>0)
         {
             cout<<"Desplegando cuentas en espera:"<<endl;
@@ -489,31 +492,31 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                 cout<<endl;
             }
             cout<<"Que desea relizar?\n1)Aceptar todos\n2)Ignorar todos\n3)Aceptar por nombre\n4)Salir"<<endl;
-            cin>>elec;
+            cin>>elec;  //lectura de opción
             switch(elec)
             {
             case 1:
                 cout<<"Validando el cambio para todos los usuarios..."<<endl;  
                 for(int c=0;c<con;c++)
                 {
-                    busqueda.seekp(ubicaciones[c]-(sizeof(enlista[c].fecha)+sizeof(enlista[c].cuenta)));
-                    enlista[c].cuenta = cambio;
-                    busqueda.write((char *)&enlista[c].cuenta,sizeof(enlista[c].cuenta));
+                    busqueda.seekp(ubicaciones[c]-(sizeof(enlista[c].fecha)+sizeof(enlista[c].cuenta))); //modificación de tipo de cuenta mediante ubicación
+                    enlista[c].cuenta = cambio;  // reasignación según caso específico
+                    busqueda.write((char *)&enlista[c].cuenta,sizeof(enlista[c].cuenta));  // cambio
                 }                  
                 cout<<"Realizado..."<<endl;
                 break;
             case 2:
-                cout<<"Recibido,\nSe han ignorado"<<con<<"usuarios, se volverán a mostar en posterior intentos...\n Volviendo al menu..."<<endl;
+                cout<<"Recibido,\nSe han ignorado "<<con<<" usuarios, se volverán a mostar en posterior intentos...\n Volviendo al menu..."<<endl;  // caso de estancias ignoradas
                 break;
             case 3:                    
                 cout<<"Digite el nombre a aceptar: "<<endl;
                 cin>>buscar;
                 strcpy(conversor,buscar.c_str());
-                buscar = convertToString(conversor,ML);
+                buscar = convertToString(conversor,ML);  // conversión a formato válido
                 for(int b=0;b<con;b++)
                 {
-                    comparar = convertToString(enlista[b].nombre,ML);
-                    if (comparar == buscar)
+                    comparar = convertToString(enlista[b].nombre,ML);  // conversión a formato manejable
+                    if (comparar == buscar)  // cambio solo a nombre específico
                     {
                         busqueda.seekp(ubicaciones[b]-(sizeof(enlista[b].fecha)+sizeof(enlista[b].cuenta)));
                         enlista[b].cuenta = cambio;
@@ -536,6 +539,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     }
     else
         cout<<"Ha ocurrido un problema con la lectura de datos..."<<endl;
-    busqueda.close();
+    busqueda.close();  // cierre de archivo final
     return;
+    //--CORREGIR GENERACIÓN DE ARCHIVO
 }
