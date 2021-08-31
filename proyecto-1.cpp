@@ -55,7 +55,7 @@ int main()
     timeinfo = localtime(&actual);  //cambiar el formato a la zona configurada
     string nombre = "perfiles.txt"; //nombre del archivo de usario
     string aux,*apaux,user,password,persona; //cadenas para la lectura de teclado y asignaciones
-    fstream usuarios;   // stream para el manejo de archivos
+    fstream usuarios,generar;   // stream para el manejo de archivos
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
     alec = &lec;  // variable y puntero del menu general
     avar = &var;  // variable y puntero de menus privados
@@ -103,7 +103,7 @@ int main()
                         correcta = false;
                         do
                         {
-                            cout<<"Digite la contraseña del usuario "<<user<<": ";
+                            cout<<"Digite la contraseña del usuario "<<user<<"\nContraseña: ";
                             cin>> aux;
                             strcpy(buscado,aux.c_str());  // conversión para mantener tamanios
                             aux = convertToString(buscado,ML);  // convertir a string para facilidad de comparacion
@@ -114,12 +114,11 @@ int main()
                             }
                             con++;
                         } while (con<=3); // si excede los tres intentos se sabra
-                        usuarios.close();
                         if(correcta)  // verificación de la contraseña correcta
                         {
                             opt =registro.tipo;
-                            do
-                            {
+                            //do
+                            //{
                                 switch(opt)   //--switch de roles
                                 {
                                     case 'a':   //----------------------------Funcionalidades del admin--------------------------------------
@@ -158,12 +157,12 @@ int main()
                                                     break;
                                                 default: 
                                                     cout<<"Volviendo a mostrar el menu"<<endl;
-                                                    break;
-                                                menu_admin();
-                                                cout<<"Digite su opción, admin: "<<endl;
-                                                cin>> *avar;
+                                                    //break;
                                             }
-                                        } while (var!=6);
+                                            menu_admin();
+                                            cout<<"Digite su opción, admin: "<<endl;
+                                            cin>> *avar;
+                                        }while (var!=6);
                                     break;
                                     case 'c':   //---------------------------------Funcionalidades del cliente----------------------------------
                                         menu_client();
@@ -233,7 +232,7 @@ int main()
                                         cout<<"Opcion no valida volviendo al loggueo"<<endl;
                                         break;
                                 }
-                            } while (opt!='s');
+                            //}while(opt!='s');
                         }
                         else  // else en caso de bloque de usuario
                         {
@@ -280,8 +279,8 @@ int main()
                 break;
             case 2:
                 cout<<"Preparandose para crear un nuevo usuario..."<<endl;
-                usuarios.open(nombre,ios::out |ios::binary |ios::app);
-                if(usuarios.is_open())
+                generar.open(nombre,ios::out | ios::binary | ios::app);
+                if(generar.is_open())
                 {
                     timeinfo = localtime( &actual); //cambio de formato de tiempo
                     strcpy(date,ctime(&actual)); //cambio a char para ser copiado en date
@@ -301,13 +300,13 @@ int main()
                     nuevo.tipo = letra;
                     nuevo.cuenta = 'e';
                     strcpy(nuevo.fecha,date);
-                    usuarios.open(nombre,ios::app);
-                        usuarios.write(nuevo.nombre,sizeof(nuevo.nombre));
-                        usuarios.write(nuevo.contrasena,sizeof(nuevo.contrasena));
-                        usuarios.write((char *)&nuevo.tipo,sizeof(nuevo.tipo));
-                        usuarios.write((char *)&nuevo.cuenta,sizeof(nuevo.cuenta));
-                        usuarios.write(nuevo.fecha,sizeof(nuevo.fecha));
-                    usuarios.close();
+                    generar.open(nombre,ios::app);
+                        generar.write(nuevo.nombre,sizeof(nuevo.nombre));
+                        generar.write(nuevo.contrasena,sizeof(nuevo.contrasena));
+                        generar.write((char *)&nuevo.tipo,sizeof(nuevo.tipo));
+                        generar.write((char *)&nuevo.cuenta,sizeof(nuevo.cuenta));
+                        generar.write(nuevo.fecha,sizeof(nuevo.fecha));
+                    generar.close();
                     cout<<"Usuario creado correctamente, para estar activo requiere validación de un admin...Este pendiente de esto"<<endl;
                 }
                 else
@@ -338,7 +337,7 @@ int main()
                 cout<<"Volviendo a despleguar el menú: "<<endl;
                 break;
         }
-    } while (lec!=5);
+    }while (lec!=5);
     cout<<"Vuelva pronto : )"<<endl;
     return 0;   
 }
@@ -463,17 +462,17 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     int elec,con = 0;
     string buscar,comparar;
     char conversor[ML];
-    fstream usuarios;
-    usuarios.open(nombre,ios::in | ios::binary |ios::out);  // abrir el archivo en los tres modos
-    if(usuarios.is_open()) //verificación de apertura de archivo
+    fstream busqueda;
+    busqueda.open(nombre,ios::binary| ios::in | ios::out);  // abrir el archivo en los tres modos
+    if(busqueda.is_open()) //verificación de apertura de archivo
     {
-        while(!usuarios.eof())  // mientras el archivo no termine
+        while(!busqueda.eof())  // mientras el archivo no termine
         {
-            usuarios.read(enlista[con].nombre,sizeof(enlista[con].nombre));
-            usuarios.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
-            usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
-            usuarios.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
-            usuarios.read(enlista[con].fecha,sizeof(enlista[con].fecha));
+            busqueda.read(enlista[con].nombre,sizeof(enlista[con].nombre));
+            busqueda.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
+            busqueda.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
+            busqueda.read((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
+            busqueda.read(enlista[con].fecha,sizeof(enlista[con].fecha));
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
                 con++;
         }
@@ -489,17 +488,17 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                 cout<<"Creación: "<<enlista[i].fecha<<endl;
                 cout<<endl;
             }
-            cout<<"¿Qué desea relizar?\n1)Aceptar todos\n2)Ignorar todos\n3)Aceptar por nombre\n4)Salir"<<endl;
+            cout<<"Que desea relizar?\n1)Aceptar todos\n2)Ignorar todos\n3)Aceptar por nombre\n4)Salir"<<endl;
             cin>>elec;
-            switch (elec)
+            switch(elec)
             {
             case 1:
                 cout<<"Validando el cambio para todos los usuarios..."<<endl;  
                 for(int c=0;c<con;c++)
                 {
-                    usuarios.seekp(ubicaciones[c]-(sizeof(enlista[c].fecha)+sizeof(enlista[c].cuenta)));
+                    busqueda.seekp(ubicaciones[c]-(sizeof(enlista[c].fecha)+sizeof(enlista[c].cuenta)));
                     enlista[c].cuenta = cambio;
-                    usuarios.write((char *)&enlista[c].cuenta,sizeof(enlista[c].cuenta));
+                    busqueda.write((char *)&enlista[c].cuenta,sizeof(enlista[c].cuenta));
                 }                  
                 cout<<"Realizado..."<<endl;
                 break;
@@ -516,9 +515,9 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                     comparar = convertToString(enlista[b].nombre,ML);
                     if (comparar == buscar)
                     {
-                        usuarios.seekp(ubicaciones[b]-(sizeof(enlista[b].fecha)+sizeof(enlista[b].cuenta)));
+                        busqueda.seekp(ubicaciones[b]-(sizeof(enlista[b].fecha)+sizeof(enlista[b].cuenta)));
                         enlista[b].cuenta = cambio;
-                        usuarios.write((char *)&enlista[b].cuenta,sizeof(enlista[b].cuenta));
+                        busqueda.write((char *)&enlista[b].cuenta,sizeof(enlista[b].cuenta));
                     }
                 }
                 break;
@@ -537,6 +536,6 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     }
     else
         cout<<"Ha ocurrido un problema con la lectura de datos..."<<endl;
-    usuarios.close();
+    busqueda.close();
     return;
 }
