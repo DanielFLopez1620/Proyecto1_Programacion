@@ -300,17 +300,16 @@ int main()
                     nuevo.tipo = letra;
                     nuevo.cuenta = 'e';
                     strcpy(nuevo.fecha,date);
-                    generar.open(nombre,ios::app);
-                        generar.write(nuevo.nombre,sizeof(nuevo.nombre));
-                        generar.write(nuevo.contrasena,sizeof(nuevo.contrasena));
-                        generar.write((char *)&nuevo.tipo,sizeof(nuevo.tipo));
-                        generar.write((char *)&nuevo.cuenta,sizeof(nuevo.cuenta));
-                        generar.write(nuevo.fecha,sizeof(nuevo.fecha));
-                    generar.close();
+                    generar.write(nuevo.nombre,sizeof(nuevo.nombre));
+                    generar.write(nuevo.contrasena,sizeof(nuevo.contrasena));
+                    generar.write((char *)&nuevo.tipo,sizeof(nuevo.tipo));
+                    generar.write((char *)&nuevo.cuenta,sizeof(nuevo.cuenta));
+                    generar.write(nuevo.fecha,sizeof(nuevo.fecha));
                     cout<<"Usuario creado correctamente, para estar activo requiere validación de un admin...Este pendiente de esto"<<endl;
                 }
                 else
                     cout<<"Ha ocurrido un error, no archivo ni master detectado...\nVolviendo al menu"<<endl;
+                generar.close();
             break;
             case 3:
                 cout<<"Desplegando plantilla informativa..."<<endl;
@@ -463,7 +462,8 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     string buscar,comparar;
     char conversor[ML];
     fstream busqueda;
-    busqueda.open(nombre,ios::binary| ios::in);  // abrir el archivo en modo lectura
+    busqueda.open(nombre,ios::in | ios::out | ios::binary);  // abrir el archivo en modo lectura
+    system("pause");
     if(busqueda.is_open()) //verificación de apertura de archivo
     {
         while(!busqueda.eof())  // mientras el archivo no termine
@@ -476,9 +476,11 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             ubicaciones[con] = busqueda.tellp(); // guardado de posición para cambio
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
                 con++;
+            system("pause");
         }
         busqueda.close();
-        busqueda.open(nombre,ios::binary | ios::out);  // archivo en modo escritura
+        cout<<"Pasando a parte 2: "<<endl;
+        busqueda.open(nombre,ios::out | ios::binary);  // archivo en modo escritura
         if(con>0)
         {
             cout<<"Desplegando cuentas en espera:"<<endl;
