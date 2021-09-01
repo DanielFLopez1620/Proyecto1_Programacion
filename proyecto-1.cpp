@@ -473,7 +473,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             busqueda.read((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
             busqueda.read(enlista[con].fecha,sizeof(enlista[con].fecha));
             ubicaciones[con] = busqueda.tellp(); // guardado de posición para cambio
-            dir = busqueda.tellp();  // guardado de dirección especifica
+            dir = busqueda.tellg();  // guardado de dirección especifica
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
             {
                 nom = convertToString(enlista[con].nombre,ML);
@@ -486,6 +486,8 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                         busqueda.seekp(dir-(sizeof(enlista[con].fecha)+sizeof(enlista[con].cuenta)));
                         enlista[con].cuenta = letra;
                         busqueda.write((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
+                        busqueda.seekg(dir); // volver al punto de lectura correcto
+                        cout<<"Se ha validado el usuario..."<<endl;
                         break;
                     case 2:
                         cout<<"Se ha ignorado el cambio, volverá a aparecer en posteriores ocasiones"<<endl;
@@ -494,6 +496,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                         busqueda.seekp(dir-(sizeof(enlista[con].fecha)+sizeof(enlista[con].cuenta)));
                         enlista[con].cuenta = 'c';
                         busqueda.write((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
+                        busqueda.seekg(dir); // volver al punto de lectura correcto
                         cout<<"Se ha solicitado el cambio de rol al usuario..."<<endl;
                         break;
                     default:
@@ -501,7 +504,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                         break;
                 }
                 con++;
-                busqueda.seekg(dir); // volver al punto de lectura correcto
+                
                 //--PENDIENTE CORREGIR SISTEMA DE DESBLOQUEO
             }
         }
@@ -510,7 +513,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
         {
             nom = convertToString(enlista[con].nombre,ML);
             fecha = convertToString(enlista[con].fecha,ML);  // conversión a formato válido
-            cout<<"Nombre: "<<nom<<"\nContraseña:**********\nTipo"<<(char *)&enlista[con].tipo<<"\nCuenta"<<(char *)&enlista[con].cuenta<<"\nFecha: "<<fecha<<endl;
+            cout<<"Nombre: "<<nom<<"\nContraseña:**********\nTipo: "<<(char *)&enlista[con].tipo<<"\nCuenta: "<<(char *)&enlista[con].cuenta<<"\nFecha: "<<fecha<<endl;
         }
     }
     else
