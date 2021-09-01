@@ -45,7 +45,7 @@ int main()
     setlocale(LC_ALL,"");  //configuración de región
     int var,*avar,lec,*alec,con=0;  //punteros y variables de manejo de menu;
     char opt,letra,cambio;  //auxiliares y apoyos en el manejo del menu;
-    bool encontrado,correcta,permitido,borrada; // booleanos del programa
+    bool encontrado,correcta,permitido,borrada,acambiar; // booleanos del programa
     listado compras[ML];   // estrucutura para recibos
     personal nuevo,registro,enlista[ML]; //estructura de personal para nuevos usuarios
     time_t actual;    //variable de tipo tiempo
@@ -74,6 +74,7 @@ int main()
                 cout<<"Digite su nombre:";
                 getline(cin>>ws,*apaux);  //lectura de nombre
                 permitido = true;
+                acambiar = false;
                 usuarios.open(nombre,ios::in | ios::binary);  // apertura de archivo en modo binario
                 if(usuarios.is_open())
                 {
@@ -97,6 +98,8 @@ int main()
                     usuarios.close();
                     if(registro.cuenta == 'b' || registro.cuenta=='d'  || registro.cuenta == 'e')
                         permitido = false;
+                    else if(registro.cuenta == 'c')
+                        acambiar = true;
                     if(encontrado && permitido)  //verificación de encontrado del usuario
                     {
                         password = convertToString(registro.contrasena,ML);
@@ -231,6 +234,9 @@ int main()
                                     break;
                             }
                         }
+                        else if(acambiar) // else para cambio de rol de usuario
+                            cout<<"El admin a pedido cambio de rol de su cuenta, seleccione un nuevo rol: "<<endl;
+                            //PENDIENTE DEFINIR EL CAMBIO DE ROL
                         else  // else en caso de bloque de usuario
                         {
                             cout<<"Contraseña digitada incorrectamente 3 veces, se bloqueo el usuario..."<<endl;
@@ -464,6 +470,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     char conversor[ML]={' '};
     personal temporal;
     fstream busqueda;
+    //Primera apertura para búsqueda de usuarios con la condiicion "letra":
     busqueda.open(nombre, ios::binary | ios::in | ios::out);  // abrir el archivo en los tres modos
     if(busqueda.is_open()) //verificación de apertura de archivo
     {
@@ -479,12 +486,12 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
             {
                 cout<<endl<<"Nombre: "<<enlista[con].nombre<<endl;
-                cout<<"Contraseña: "<<enlista[con].contrasena<<endl;
+                cout<<"Contraseña: *******"<<endl; //No se despliega la contraseña pues es privada
                 cout<<"Tipo: "<<enlista[con].tipo<<endl;
                 cout<<"Cuenta: "<<enlista[con].cuenta<<endl;
                 cout<<"Creación: "<<enlista[con].fecha<<endl;
                 cout<<endl;
-                con++;
+                con++;  // contador de coincidencias
             }
         }
         
@@ -493,6 +500,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
         cout<<"Ha ocurrido un problema con el archivo"<<endl;
     busqueda.close();
     cout<<"Lectura completada..."<<endl;
+    //Segunda o n apertura del archivo para el cambio de permiso mediante el nombre 
     do
     {
         busqueda.open(nombre,ios::binary | ios::out | ios::in);
@@ -500,39 +508,39 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
         {
             cout<<"Digite un caso:\n1)Aceptar por nombre\n2)Pedir cambio por nombre\n3)Ignorar todo\n4)Salir"<<endl;
             cin>>elec;
-            if(elec == 1 || elec == 2)
+            if(elec == 1 || elec == 2) // opcion de modificación
             {
                 cout<<"Digite el nombre a buscar: ";
-                cin>> hallar;
+                cin>> hallar;  // nombre a buscar
                 hallado = false;
                 strcpy(conversor,hallar.c_str());
-                hallar = convertToString(conversor,ML);
-                while (!busqueda.eof())
+                hallar = convertToString(conversor,ML);  // conversión a un arreglo de tamaño equivalente a la propiedad nombre de la estructura
+                while (!busqueda.eof())  // mientras el archivo no termine
                 {
                     busqueda.read(temporal.nombre,sizeof(temporal.nombre));
                     busqueda.read(temporal.contrasena,sizeof(temporal.contrasena));  //lectura de registros mediante estructuras
                     busqueda.read((char *)&temporal.tipo,sizeof(temporal.tipo));
                     busqueda.read((char *)&temporal.cuenta,sizeof(temporal.cuenta));
                     busqueda.read(temporal.fecha,sizeof(temporal.fecha));
-                    nom = convertToString(temporal.nombre,ML);
-                    cout<<nom<<"-"<<hallar<<endl;
-                    if(nom==hallar)
+                    nom = convertToString(temporal.nombre,ML); // conversión de nombre a string
+                    //cout<<nom<<"-"<<hallar<<endl;  // muestre aquí para verificar la comparación
+                    if(nom==hallar)  // comparación y validación para cambio
                     {
                         cout<<"Encontrado"<<endl;
                         hallado = true;
                         dir = busqueda.tellp(); // guardado de posición para cambio
-                        busqueda.seekp(dir-(sizeof(temporal.fecha)+sizeof(temporal.cuenta)));
+                        busqueda.seekp(dir-(sizeof(temporal.fecha)+sizeof(temporal.cuenta)));  // ir a la posición para modificar el caracter de cuenta
                         if(elec == 1)
                         {
-                            temporal.cuenta = cambio;
+                            temporal.cuenta = cambio;  // cambio dependendiendo de la ocasión ya sea desbloqueo o activación
                             cout<<"Se ha valido el usuario: "<<nom<<endl;
                         }
                         else
                         {
-                            temporal.cuenta = 'c';
+                            temporal.cuenta = 'c';  // petición de cambio de tipo
                             cout<<"Se ha pedido un cambio al usuario: "<<nom<<endl;
                         }
-                        busqueda.write((char *)&temporal.cuenta,sizeof(temporal.cuenta));
+                        busqueda.write((char *)&temporal.cuenta,sizeof(temporal.cuenta));  // actualización del permiso
                     }
                 }
             }
@@ -544,8 +552,8 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                 cout<<"Volviendo a desplegar el menu..."<<endl;
         }
         else
-            cout<<"Ha ocurrido un problmea con las asignación..."<<endl;
+            cout<<"Ha ocurrido un problmea con las asignación..."<<endl; // mensaje de error en caso de apertura del archivo
         busqueda.close();
-    } while (elec!=3 && elec!=4);
+    } while (elec!=3 && elec!=4);  // hacer mientras no se indique lo contrario
     return;
 }
