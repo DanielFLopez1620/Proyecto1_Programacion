@@ -95,7 +95,7 @@ int main()
                         }
                     }
                     usuarios.close();
-                    if(registro.cuenta == 'b' || registro.cuenta=='d')
+                    if(registro.cuenta == 'b' || registro.cuenta=='d'  || registro.cuenta == 'e')
                         permitido = false;
                     if(encontrado && permitido)  //verificación de encontrado del usuario
                     {
@@ -117,122 +117,119 @@ int main()
                         if(correcta)  // verificación de la contraseña correcta
                         {
                             opt =registro.tipo;
-                            //do
-                            //{
-                                switch(opt)   //--switch de roles
-                                {
-                                    case 'a':   //----------------------------Funcionalidades del admin--------------------------------------
+                            switch(opt)   //--switch de roles
+                            {
+                                case 'a':   //----------------------------Funcionalidades del admin--------------------------------------
+                                    menu_admin();
+                                    persona = convertToString(registro.nombre,ML);
+                                    cout<<"Bienvenido :"<< persona<<endl;
+                                    cout<<"Querido admin,digite su opcion: ";
+                                    cin>>*avar;
+                                    do
+                                    {
+                                        switch(var) 
+                                        {
+                                            case 1:
+                                                cout<<"Abriendo la funcionalidad de registros..."<<endl;
+                                                letra = 'e'; // e--> en espera
+                                                cambio = 'a';
+                                                cambios_cuenta(nombre,enlista,letra,ubicaciones,cambio); // cambio para activación de cuenta
+                                                break;
+                                            case 2:
+                                                cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
+                                                letra = 'b'; // b--> bloqueado
+                                                cambio = 'a';
+                                                cambios_cuenta(nombre,enlista,letra,ubicaciones,cambio);  // cambio para desbloqueo de cuenta 
+                                                break;
+                                            case 3:
+                                                cout<<"Abriendo función de administrar categorías..."<<endl;
+                                                break;
+                                            case 4:
+                                                cout<<"Abriendo función de administrar productos..."<<endl;
+                                                break;
+                                            case 5:
+                                                cout<<"Abriendo la función de despacho de compras..."<<endl;
+                                                break;
+                                            case 6:
+                                                cout<<"Saliendo de la sesión..."<<endl;
+                                                break;
+                                            default: 
+                                                cout<<"Volviendo a mostrar el menu"<<endl;
+                                                break;
+                                        }
                                         menu_admin();
-                                        persona = convertToString(registro.nombre,ML);
-                                        cout<<"Bienvenido :"<< persona<<endl;
-                                        cout<<"Querido admin,digite su opcion: ";
-                                        cin>>*avar;
-                                        do
+                                        cout<<"Digite su opción, admin: "<<endl;
+                                        cin>> *avar;
+                                    }while (var!=6);
+                                break;
+                                case 'c':   //---------------------------------Funcionalidades del cliente----------------------------------
+                                    menu_client();
+                                    cout<<"Querido cliente,digite su opcion: ";
+                                    cin>>*avar;
+                                    do
+                                    {
+                                        switch(var)
                                         {
-                                            switch(var) 
-                                            {
-                                                case 1:
-                                                    cout<<"Abriendo la funcionalidad de registros..."<<endl;
-                                                    letra = 'e'; // e--> en espera
-                                                    cambio = 'a';
-                                                    cambios_cuenta(nombre,enlista,letra,ubicaciones,cambio); // cambio para activación de cuenta
-                                                    break;
-                                                case 2:
-                                                    cout<<"Abriendo la funcionalidad de desbloques..."<<endl;
-                                                    letra = 'b'; // b--> bloqueado
-                                                    cambio = 'a';
-                                                    cambios_cuenta(nombre,enlista,letra,ubicaciones,cambio);  // cambio para desbloqueo de cuenta 
-                                                    break;
-                                                case 3:
-                                                    cout<<"Abriendo función de administrar categorías..."<<endl;
-                                                    break;
-                                                case 4:
-                                                    cout<<"Abriendo función de administrar productos..."<<endl;
-                                                    break;
-                                                case 5:
-                                                    cout<<"Abriendo la función de despacho de compras..."<<endl;
-                                                    break;
-                                                case 6:
-                                                    cout<<"Saliendo de la sesión..."<<endl;
-                                                    break;
+                                            case 1:
+                                                cout<<"Eligio realizar una compra..."<<endl;
+                                                break;
+                                            case 2:
+                                                cout<<"Eligio la opción de cancelar compra..."<<endl;
+                                                break;
+                                            case 3:
+                                                cout<<"Calculando el total de la compra..."<<endl;
+                                                break;
+                                            case 4:
+                                                cout<<"Mostrando la cantidad de productos comprados..."<<endl;
+                                                break;
+                                            case 5:
+                                                cout<<"Saliendo de la sesión..."<<endl;
+                                                break;
                                                 default: 
-                                                    cout<<"Volviendo a mostrar el menu"<<endl;
-                                                    break;
-                                            }
-                                            menu_admin();
-                                            cout<<"Digite su opción, admin: "<<endl;
+                                                cout<<"Volviendo a mostrar el menu"<<endl;
+                                                break;
+                                            menu_client();
+                                            cout<<"Digite su opción, querido cliente: "<<endl;
                                             cin>> *avar;
-                                        }while (var!=6);
-                                    break;
-                                    case 'c':   //---------------------------------Funcionalidades del cliente----------------------------------
-                                        menu_client();
-                                        cout<<"Querido cliente,digite su opcion: ";
-                                        cin>>*avar;
-                                        do
+                                        }
+                                    } while (var!=5);
+                                break;
+                                case 'o':   //----------------------------------Funcionalidades del consultor-------------------------------
+                                    menu_consul();
+                                    cout<<"Querido consultor,digite su opcion: ";
+                                    cin>>*avar;
+                                    do
+                                    {
+                                        switch(var)
                                         {
-                                            switch(var)
-                                            {
-                                                case 1:
-                                                    cout<<"Eligio realizar una compra..."<<endl;
-                                                    break;
-                                                case 2:
-                                                    cout<<"Eligio la opción de cancelar compra..."<<endl;
-                                                    break;
-                                                case 3:
-                                                    cout<<"Calculando el total de la compra..."<<endl;
-                                                    break;
-                                                case 4:
-                                                    cout<<"Mostrando la cantidad de productos comprados..."<<endl;
-                                                    break;
-                                                case 5:
-                                                    cout<<"Saliendo de la sesión..."<<endl;
-                                                    break;
-                                                default: 
-                                                    cout<<"Volviendo a mostrar el menu"<<endl;
-                                                    break;
-                                                menu_client();
-                                                cout<<"Digite su opción, querido cliente: "<<endl;
-                                                cin>> *avar;
-                                            }
-                                        } while (var!=5);
+                                        case 1:
+                                                cout<<"Cargando registros para listar productos..."<<endl;
+                                                break;
+                                            case 2:
+                                                cout<<"Cargando regristros de los clientes existentes..."<<endl;
+                                                break;
+                                            case 3:
+                                                cout<<"Calculando el total de ventas del programa..."<<endl;
+                                                break;
+                                            case 4:
+                                                cout<<"Buscando el producto más vendido..."<<endl;
+                                                break;
+                                            case 5:
+                                                cout<<"Saliendo de la sesión..."<<endl;
+                                                break;
+                                            default: 
+                                                cout<<"Volviendo a mostrar el menu"<<endl;
+                                                break;
+                                            menu_consul();
+                                            cout<<"Digite su opción, querido cliente: "<<endl;
+                                            cin>> *avar;
+                                        }
+                                    } while (var!=5);
+                                break;
+                                default:
+                                    cout<<"Opcion no valida volviendo al loggueo"<<endl;
                                     break;
-                                    case 'o':   //----------------------------------Funcionalidades del consultor-------------------------------
-                                        menu_consul();
-                                        cout<<"Querido consultor,digite su opcion: ";
-                                        cin>>*avar;
-                                        do
-                                        {
-                                            switch(var)
-                                            {
-                                                case 1:
-                                                    cout<<"Cargando registros para listar productos..."<<endl;
-                                                    break;
-                                                case 2:
-                                                    cout<<"Cargando regristros de los clientes existentes..."<<endl;
-                                                    break;
-                                                case 3:
-                                                    cout<<"Calculando el total de ventas del programa..."<<endl;
-                                                    break;
-                                                case 4:
-                                                    cout<<"Buscando el producto más vendido..."<<endl;
-                                                    break;
-                                                case 5:
-                                                    cout<<"Saliendo de la sesión..."<<endl;
-                                                    break;
-                                                default: 
-                                                    cout<<"Volviendo a mostrar el menu"<<endl;
-                                                    break;
-                                                menu_consul();
-                                                cout<<"Digite su opción, querido cliente: "<<endl;
-                                                cin>> *avar;
-                                            }
-                                        } while (var!=5);
-                                    break;
-                                    default:
-                                        cout<<"Opcion no valida volviendo al loggueo"<<endl;
-                                        break;
-                                }
-                            //}while(opt!='s');
+                            }
                         }
                         else  // else en caso de bloque de usuario
                         {
@@ -266,8 +263,10 @@ int main()
                     }
                     else
                     {
-                        if(registro.cuenta == 'b')
+                        if(registro.cuenta == 'b')  // en caso de cuenta bloqueada
                             cout<<"Su cuenta se encuentra aun bloqueada, contacte al admin para el desbloque"<<endl;
+                        if(registro.cuenta== 'e') // en caso de cuenta en espera
+                            cout<<"Su cuenta aún está en espera, vuelva pronto para verificar si ha sido activada por el admin"<<endl;
                         else
                             cout<<"Usuario no encontrado, posiblemente no se ha creado o fue borrado...\nVolviendo al menu"<<endl;
                     }
@@ -285,18 +284,18 @@ int main()
                     timeinfo = localtime( &actual); //cambio de formato de tiempo
                     strcpy(date,ctime(&actual)); //cambio a char para ser copiado en date
                     date[10]= date[13] = '_';
-                    date[3]=date[7]=date[16]=date[19]='-';
+                    date[3]=date[7]=date[16]=date[19]='-';  // corrección de formato de fecha
                     cout<<"Digite su nuevo nombre usuario :";
-                    getline(cin>>ws,aux);
-                    strcpy(nuevo.nombre,aux.c_str());
+                    getline(cin>>ws,aux); 
+                    strcpy(nuevo.nombre,aux.c_str());  // copiado de nombre
                     cout<<"Digite una nueva contraseña: ";
-                    getline(cin>>ws,aux);
+                    getline(cin>>ws,aux);   // copiado de contraseña
                     strcpy(nuevo.contrasena,aux.c_str());
                     cout<<"Digite el rol inicial (a--> admin, c-->cliente, o--> consultor)"<<endl;
                     do
                     {
                         cin>>letra;
-                    } while (letra!='a' && letra!='c' && letra!='o');
+                    } while (letra!='a' && letra!='c' && letra!='o');  // lectura de rol permitido
                     nuevo.tipo = letra;
                     nuevo.cuenta = 'e';
                     strcpy(nuevo.fecha,date);
@@ -304,7 +303,7 @@ int main()
                     generar.write(nuevo.contrasena,sizeof(nuevo.contrasena));
                     generar.write((char *)&nuevo.tipo,sizeof(nuevo.tipo));
                     generar.write((char *)&nuevo.cuenta,sizeof(nuevo.cuenta));
-                    generar.write(nuevo.fecha,sizeof(nuevo.fecha));
+                    generar.write(nuevo.fecha,sizeof(nuevo.fecha)); //escritura de datos en archivo
                     cout<<"Usuario creado correctamente, para estar activo requiere validación de un admin...Este pendiente de esto"<<endl;
                 }
                 else
@@ -459,11 +458,11 @@ string convertToString(char* arreglo, int size) //conversión de string a caract
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio)
 {
     int elec,con = 0;
-    string buscar,comparar;
+    string nom,fecha;
+    long dir;
     char conversor[ML];
     fstream busqueda;
-    busqueda.open(nombre,ios::in | ios::out | ios::binary);  // abrir el archivo en modo lectura
-    system("pause");
+    busqueda.open(nombre, ios::binary | ios::in | ios::out);  // abrir el archivo en modo lectura
     if(busqueda.is_open()) //verificación de apertura de archivo
     {
         while(!busqueda.eof())  // mientras el archivo no termine
@@ -474,74 +473,48 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             busqueda.read((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
             busqueda.read(enlista[con].fecha,sizeof(enlista[con].fecha));
             ubicaciones[con] = busqueda.tellp(); // guardado de posición para cambio
+            dir = busqueda.tellp();  // guardado de dirección especifica
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
-                con++;
-            system("pause");
-        }
-        busqueda.close();
-        cout<<"Pasando a parte 2: "<<endl;
-        busqueda.open(nombre,ios::out | ios::binary);  // archivo en modo escritura
-        if(con>0)
-        {
-            cout<<"Desplegando cuentas en espera:"<<endl;
-            for(int i=0;i<con;i++)  // ciclo de mostrado de recopilaciones
             {
-                cout<<"Nombre: "<<enlista[i].nombre<<endl;
-                cout<<"Contraseña:*********************** "<<endl;
-                cout<<"Tipo: "<<enlista[i].tipo<<endl;
-                cout<<"Cuenta: "<<enlista[i].cuenta<<endl;
-                cout<<"Creación: "<<enlista[i].fecha<<endl;
-                cout<<endl;
-            }
-            cout<<"Que desea relizar?\n1)Aceptar todos\n2)Ignorar todos\n3)Aceptar por nombre\n4)Salir"<<endl;
-            cin>>elec;  //lectura de opción
-            switch(elec)
-            {
-            case 1:
-                cout<<"Validando el cambio para todos los usuarios..."<<endl;  
-                for(int c=0;c<con;c++)
+                nom = convertToString(enlista[con].nombre,ML);
+                cout<<"Usuario: "<<nom<<"\nEstado actual: "<<enlista[con].cuenta<<endl;
+                cout<<"Que desea relizar?\n1)Aceptar cambio\n2)Ignorar cambio\n3)Pedir cambio de rol\n4)Continuar"<<endl;
+                cin>>elec;  //lectura de opción
+                switch(elec)
                 {
-                    busqueda.seekp(ubicaciones[c]-(sizeof(enlista[c].fecha)+sizeof(enlista[c].cuenta))); //modificación de tipo de cuenta mediante ubicación
-                    enlista[c].cuenta = cambio;  // reasignación según caso específico
-                    busqueda.write((char *)&enlista[c].cuenta,sizeof(enlista[c].cuenta));  // cambio
-                }                  
-                cout<<"Realizado..."<<endl;
-                break;
-            case 2:
-                cout<<"Recibido,\nSe han ignorado "<<con<<" usuarios, se volverán a mostar en posterior intentos...\n Volviendo al menu..."<<endl;  // caso de estancias ignoradas
-                break;
-            case 3:                    
-                cout<<"Digite el nombre a aceptar: "<<endl;
-                cin>>buscar;
-                strcpy(conversor,buscar.c_str());
-                buscar = convertToString(conversor,ML);  // conversión a formato válido
-                for(int b=0;b<con;b++)
-                {
-                    comparar = convertToString(enlista[b].nombre,ML);  // conversión a formato manejable
-                    if (comparar == buscar)  // cambio solo a nombre específico
-                    {
-                        busqueda.seekp(ubicaciones[b]-(sizeof(enlista[b].fecha)+sizeof(enlista[b].cuenta)));
-                        enlista[b].cuenta = cambio;
-                        busqueda.write((char *)&enlista[b].cuenta,sizeof(enlista[b].cuenta));
-                    }
+                    case 1:
+                        busqueda.seekp(dir-(sizeof(enlista[con].fecha)+sizeof(enlista[con].cuenta)));
+                        enlista[con].cuenta = letra;
+                        busqueda.write((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
+                        break;
+                    case 2:
+                        cout<<"Se ha ignorado el cambio, volverá a aparecer en posteriores ocasiones"<<endl;
+                        break;
+                    case 3:
+                        busqueda.seekp(dir-(sizeof(enlista[con].fecha)+sizeof(enlista[con].cuenta)));
+                        enlista[con].cuenta = 'c';
+                        busqueda.write((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
+                        cout<<"Se ha solicitado el cambio de rol al usuario..."<<endl;
+                        break;
+                    default:
+                        cout<<"Continuando frente a omisión..."<<endl;
+                        break;
                 }
-                break;
-            case 4:
-                cout<<"Saliendo..."<<endl;
-                break;
-            default:
-                cout<<"Volviendo al menu, opcion no valida digitada..."<<endl;
-                break;
+                con++;
+                busqueda.seekg(dir); // volver al punto de lectura correcto
+                //--PENDIENTE CORREGIR SISTEMA DE DESBLOQUEO
             }
         }
-        else if (con==0)
-            cout<<"No hay usuarios o personal en lista de espera"<<endl;
-        else
-            cout<<"Ha ocurrido un problema al acceder al archivo..."<<endl;
+        cout<<"A continuación se despliegan los cambios y aspectos realizados: "<<endl;
+        for(int a=0;a<con;a++)
+        {
+            nom = convertToString(enlista[con].nombre,ML);
+            fecha = convertToString(enlista[con].fecha,ML);  // conversión a formato válido
+            cout<<"Nombre: "<<nom<<"\nContraseña:**********\nTipo"<<(char *)&enlista[con].tipo<<"\nCuenta"<<(char *)&enlista[con].cuenta<<"\nFecha: "<<fecha<<endl;
+        }
     }
     else
-        cout<<"Ha ocurrido un problema con la lectura de datos..."<<endl;
-    busqueda.close();  // cierre de archivo final
+        cout<<"Ha ocurrido un problema con el archivo"<<endl;
+    busqueda.close();
     return;
-    //--CORREGIR GENERACIÓN DE ARCHIVO
 }
