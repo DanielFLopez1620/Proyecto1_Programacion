@@ -265,7 +265,7 @@ int main()
                     {
                         if(registro.cuenta == 'b')  // en caso de cuenta bloqueada
                             cout<<"Su cuenta se encuentra aun bloqueada, contacte al admin para el desbloque"<<endl;
-                        if(registro.cuenta== 'e') // en caso de cuenta en espera
+                        else if(registro.cuenta== 'e') // en caso de cuenta en espera
                             cout<<"Su cuenta aún está en espera, vuelva pronto para verificar si ha sido activada por el admin"<<endl;
                         else
                             cout<<"Usuario no encontrado, posiblemente no se ha creado o fue borrado...\nVolviendo al menu"<<endl;
@@ -458,13 +458,16 @@ string convertToString(char* arreglo, int size) //conversión de string a caract
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio)
 {
     int elec,con = 0;
-    string nom,fecha;
+    string nom,fecha,hallar;
+    bool hallado;
     long dir;
-    char conversor[ML];
+    char conversor[ML]={' '};
+    personal temporal;
     fstream busqueda;
-    busqueda.open(nombre, ios::binary | ios::in | ios::out);  // abrir el archivo en modo lectura
+    busqueda.open(nombre, ios::binary | ios::in | ios::out);  // abrir el archivo en los tres modos
     if(busqueda.is_open()) //verificación de apertura de archivo
     {
+        con = 0;
         while(!busqueda.eof())  // mientras el archivo no termine
         {
             busqueda.read(enlista[con].nombre,sizeof(enlista[con].nombre));
@@ -472,52 +475,77 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             busqueda.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
             busqueda.read((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
             busqueda.read(enlista[con].fecha,sizeof(enlista[con].fecha));
-            ubicaciones[con] = busqueda.tellp(); // guardado de posición para cambio
-            dir = busqueda.tellg();  // guardado de dirección especifica
+            ubicaciones[con] = busqueda.tellg(); // guardado de posición para cambio
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
             {
-                nom = convertToString(enlista[con].nombre,ML);
-                cout<<"Usuario: "<<nom<<"\nEstado actual: "<<enlista[con].cuenta<<endl;
-                cout<<"Que desea relizar?\n1)Aceptar cambio\n2)Ignorar cambio\n3)Pedir cambio de rol\n4)Continuar"<<endl;
-                cin>>elec;  //lectura de opción
-                switch(elec)
-                {
-                    case 1:
-                        busqueda.seekp(dir-(sizeof(enlista[con].fecha)+sizeof(enlista[con].cuenta)));
-                        enlista[con].cuenta = letra;
-                        busqueda.write((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
-                        busqueda.seekg(dir); // volver al punto de lectura correcto
-                        cout<<"Se ha validado el usuario..."<<endl;
-                        break;
-                    case 2:
-                        cout<<"Se ha ignorado el cambio, volverá a aparecer en posteriores ocasiones"<<endl;
-                        break;
-                    case 3:
-                        busqueda.seekp(dir-(sizeof(enlista[con].fecha)+sizeof(enlista[con].cuenta)));
-                        enlista[con].cuenta = 'c';
-                        busqueda.write((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
-                        busqueda.seekg(dir); // volver al punto de lectura correcto
-                        cout<<"Se ha solicitado el cambio de rol al usuario..."<<endl;
-                        break;
-                    default:
-                        cout<<"Continuando frente a omisión..."<<endl;
-                        break;
-                }
+                cout<<endl<<"Nombre: "<<enlista[con].nombre<<endl;
+                cout<<"Contraseña: "<<enlista[con].contrasena<<endl;
+                cout<<"Tipo: "<<enlista[con].tipo<<endl;
+                cout<<"Cuenta: "<<enlista[con].cuenta<<endl;
+                cout<<"Creación: "<<enlista[con].fecha<<endl;
+                cout<<endl;
                 con++;
-                
-                //--PENDIENTE CORREGIR SISTEMA DE DESBLOQUEO
             }
         }
-        cout<<"A continuación se despliegan los cambios y aspectos realizados: "<<endl;
-        for(int a=0;a<con;a++)
-        {
-            nom = convertToString(enlista[con].nombre,ML);
-            fecha = convertToString(enlista[con].fecha,ML);  // conversión a formato válido
-            cout<<"Nombre: "<<nom<<"\nContraseña:**********\nTipo: "<<(char *)&enlista[con].tipo<<"\nCuenta: "<<(char *)&enlista[con].cuenta<<"\nFecha: "<<fecha<<endl;
-        }
+        
     }
     else
         cout<<"Ha ocurrido un problema con el archivo"<<endl;
     busqueda.close();
+    cout<<"Lectura completada..."<<endl;
+    do
+    {
+        busqueda.open(nombre,ios::binary | ios::out | ios::in);
+        if(busqueda.is_open())
+        {
+            cout<<"Digite un caso:\n1)Aceptar por nombre\n2)Pedir cambio por nombre\n3)Ignorar todo\n4)Salir"<<endl;
+            cin>>elec;
+            if(elec == 1 || elec == 2)
+            {
+                cout<<"Digite el nombre a buscar: ";
+                cin>> hallar;
+                hallado = false;
+                strcpy(conversor,hallar.c_str());
+                hallar = convertToString(conversor,ML);
+                while (!busqueda.eof())
+                {
+                    busqueda.read(temporal.nombre,sizeof(temporal.nombre));
+                    busqueda.read(temporal.contrasena,sizeof(temporal.contrasena));  //lectura de registros mediante estructuras
+                    busqueda.read((char *)&temporal.tipo,sizeof(temporal.tipo));
+                    busqueda.read((char *)&temporal.cuenta,sizeof(temporal.cuenta));
+                    busqueda.read(temporal.fecha,sizeof(temporal.fecha));
+                    nom = convertToString(temporal.nombre,ML);
+                    cout<<nom<<"-"<<hallar<<endl;
+                    if(nom==hallar)
+                    {
+                        cout<<"Encontrado"<<endl;
+                        hallado = true;
+                        dir = busqueda.tellp(); // guardado de posición para cambio
+                        busqueda.seekp(dir-(sizeof(temporal.fecha)+sizeof(temporal.cuenta)));
+                        if(elec == 1)
+                        {
+                            temporal.cuenta = cambio;
+                            cout<<"Se ha valido el usuario: "<<nom<<endl;
+                        }
+                        else
+                        {
+                            temporal.cuenta = 'c';
+                            cout<<"Se ha pedido un cambio al usuario: "<<nom<<endl;
+                        }
+                        busqueda.write((char *)&temporal.cuenta,sizeof(temporal.cuenta));
+                    }
+                }
+            }
+            else if (elec==3)
+                cout<<"Se han ignorado todos los usuarios, se preguntará por ellos despues, saliendo..."<<endl;
+            else if(elec== 4)
+                cout<<"Saliendo con los cambios realizados..."<<endl;
+            else
+                cout<<"Volviendo a desplegar el menu..."<<endl;
+        }
+        else
+            cout<<"Ha ocurrido un problmea con las asignación..."<<endl;
+        busqueda.close();
+    } while (elec!=3 && elec!=4);
     return;
 }
