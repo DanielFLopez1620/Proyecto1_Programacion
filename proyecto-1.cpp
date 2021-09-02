@@ -2,7 +2,8 @@
 #include<iostream>
 #include<locale.h>   //librería de configuración regional
 #include<fstream>
-#include<string.h>  
+#include<string.h> 
+#include<string>  // librerías
 #include<time.h>  //librería de manejo de tiempo y fechas
 using namespace std;
 //--ESTRUCUTURAS: ---------------------------------------------------------------------------------
@@ -38,6 +39,7 @@ void compra_producto();
 void archivoproducto ();
 string convertToString(char* arreglo, int size);
 productos buscar();
+void buscarcodigo();
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);
 //--DESARROLLO DEL MAIN---------------------------------------------------------------------------
 int main()
@@ -54,6 +56,8 @@ int main()
     char date[ML]; //arreglo char para la fecha
     timeinfo = localtime(&actual);  //cambiar el formato a la zona configurada
     string nombre = "perfiles.txt"; //nombre del archivo de usario
+    string inventario = "inventario.txt";  // nombre del archivo de los productos
+    string recibos = "historial.txt";  //nombre de archivo para recibos y facturas
     string aux,*apaux,user,password,persona; //cadenas para la lectura de teclado y asignaciones
     fstream usuarios,generar;   // stream para el manejo de archivos
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
@@ -175,6 +179,10 @@ int main()
                                         {
                                             case 1:
                                                 cout<<"Eligio realizar una compra..."<<endl;
+                                                cout<<" Hola querido "<<registro.nombre<<endl;
+                                                cout<< "A continuacion se le mostrara todos los productos en los que podra realizar su compra: "<<endl;
+                                                
+                                                
                                                 break;
                                             case 2:
                                                 cout<<"Eligio la opción de cancelar compra..."<<endl;
@@ -235,34 +243,73 @@ int main()
                             }
                         }
                         else if(acambiar) // else para cambio de rol de usuario
+                        {
                             cout<<"El admin a pedido cambio de rol de su cuenta, seleccione un nuevo rol: "<<endl;
+                            usuarios.open(nombre, ios::binary | ios::in |ios::out);
+                            if(usuarios.is_open())
+                            {
+                                encontrado = false;
+                                while(!usuarios.eof())
+                                {
+                                    usuarios.read(registro.nombre,sizeof(registro.nombre));
+                                    usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
+                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                                    usuarios.read(registro.fecha,sizeof(registro.fecha));
+                                    aux = convertToString(registro.nombre,ML);
+                                    if(user == aux)  // buscar nuevamente la concidencia
+                                    {
+                                        encontrado=true;
+                                        direccion = usuarios.tellp();  //asignar la dirección actual en registros
+                                        cin>>letra; // cambio de letra para bloqueo de usuarios
+                                        usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
+                                        do
+                                        {
+                                            cin>>letra;
+                                        } while (letra!='a' && letra!='c' && letra!='o');  // lectura de rol permitido
+                                        registro.tipo = letra;
+                                        usuarios.write((char *)&registro.tipo,sizeof(registro.tipo)); // reasignación de bloqueo
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                                cout<<"Ha ocurrido un problema con el cambio..."<<endl;
+                            usuarios.close();
                             //PENDIENTE DEFINIR EL CAMBIO DE ROL
+                        }
                         else  // else en caso de bloque de usuario
                         {
                             cout<<"Contraseña digitada incorrectamente 3 veces, se bloqueo el usuario..."<<endl;
-                            usuarios.open(nombre,ios::binary | ios::out |ios::in);  // abrir archivo en los tres modods
-                            encontrado = false;
-                            while(!usuarios.eof())
+                            user = convertToString(registro.nombre,ML);
+                            usuarios.open(nombre,ios::binary | ios::out |ios::in);  // abrir archivo en los tres modos
+                            if(usuarios.is_open())
                             {
-                                usuarios.read(registro.nombre,sizeof(registro.nombre));
-                                usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
-                                usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                                usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                                usuarios.read(registro.fecha,sizeof(registro.fecha));
-                                aux = convertToString(registro.nombre,ML);
-                                strcpy(buscado,aux.c_str());  // conversión de apoyo
-                                aux = convertToString(buscado,ML);  // paso a string para mejor comparación
-                                if(user == aux)  // buscar nuevamente la concidencia
+                                encontrado = false;
+                                while(!usuarios.eof())
                                 {
-                                    encontrado=true;
-                                    direccion = usuarios.tellp();  //asignar la dirección actual en registros
-                                    letra = 'b'; // cambio de letra para bloqueo de usuarios
-                                    usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
-                                    registro.cuenta = letra; 
-                                    usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
-                                    break;
+                                    usuarios.read(registro.nombre,sizeof(registro.nombre));
+                                    usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
+                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                                    usuarios.read(registro.fecha,sizeof(registro.fecha));
+                                    aux = convertToString(registro.nombre,ML);
+                                    strcpy(buscado,aux.c_str());  // conversión de apoyo
+                                    aux = convertToString(buscado,ML);  // paso a string para mejor comparación
+                                    if(user == aux)  // buscar nuevamente la concidencia
+                                    {
+                                        encontrado=true;
+                                        direccion = usuarios.tellp();  //asignar la dirección actual en registros
+                                        letra = 'b'; // cambio de letra para bloqueo de usuarios
+                                        usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
+                                        registro.cuenta = letra; 
+                                        usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
+                                        break;
+                                    }
                                 }
                             }
+                            else
+                                cout<<"Ha ocurrido un problema la bloquear al usuario"<<endl;
                             cout<<"Su usuario ha sido bloqueado, contacte al admin en caso de requerir desbloque"<<endl;
                             usuarios.close();
                         }
@@ -399,9 +446,10 @@ void menu_consul()   // menu del consultor
     cout<<"*********************************"<<endl;
     return;  //return final
 }
-void compra_producto()
+void compra_producto(productos produc,string inventario)
 {
-    /*cout<<"Ingrese el nombre del producto: "<<endl;
+    int autoincremental;
+    cout<<"Ingrese el nombre del producto: "<<endl;
     cin>>produc.nombre;
     cout<<"Ingrese la categoria del producto: "<<endl;
     cin>>produc.categoria;
@@ -409,15 +457,16 @@ void compra_producto()
     cin>>produc.precio;
     cout<<"Ingrese la disponibilidad del producto: "<<endl;
     cin>>produc.disponibilidad;
-    cout<<"Ingrese la venta del producto: "<<endl;
-    cin>>produc.ventas;
-    */
+    buscarcodigo(autoincremental,produc,inventario);
+    cout<<"El codigo del producto es: "<<endl;
+    cout<<autoincremental;
+    produc.codigo=autoincremental+1;
+    archivoproducto();
     return;
 }
-
-void archivoproducto()
+void archivoproducto(string inventario, productos produc)
 {
-    /*string archivo = "archivobinario.txt";
+    string archivo = "inventario.txt";
     fstream tem;
     tem.open(archivo.c_str(), ios::binary | ios::app);
     if(!tem.eof())
@@ -429,12 +478,13 @@ void archivoproducto()
         cout<<"Error em la apertura de archivo"<<endl;   
     }
     tem.close();
-    return;*/
-}
-productos buscar (string archivo)
+    return;
+    }
+productos buscar (string archivo, productos produc)
 {
     productos ejemplo;  //borrar para después
-    /*int autoincremental,i=0;
+    int i=0;
+    string nombre="";
     fstream tem;
     tem.open(archivo,ios::binary | ios::in);
     while(!tem.eof())
@@ -444,14 +494,25 @@ productos buscar (string archivo)
         if(tem.good())
         {
             cout<<" la posicion en el archivo es: "<<i+1<<endl;
-            cout<<"nombre "<< convertToString(produc.nombre,ML)<<" categoria: "<< produc.categoria <<" precio "<<produc.precio <<" disponibilidad "<<produc.disponibilidad;
+            nombre=convertToString(produc.nombre,ML);
+            cout<<"nombre "<< nombre<<" categoria: "<< produc.categoria <<" precio "<<produc.precio <<" disponibilidad "<<produc.disponibilidad<<endl;
             cout<<" ventas "<< produc.ventas <<" codigo "<<produc.codigo<<" "<<endl;
-            autoincremental=produc.codigo;
         }
         i=i+1;
-    }  */
+    } 
     return ejemplo;
 }
+void buscarcodigo(int autoincremental,productos produc,string inventario)
+{
+    fstream tem;
+    tem.open( inventario, ios::binary|ios::in );       //abriendo el archivo, en forma binaria y con entrada
+    tem.seekg((ios::end));       //ingresando el numero para poner la aguja dependiendo de lo que busque el usuario
+    tem.read((char *) &produc,sizeof(produc));       //leer en la forma binaria, para leer el contenido que esta en el apuntador y moviendose respecto al tamaño
+    autoincremental=produc.codigo;
+    tem.close();
+    return;     
+}
+
 string convertToString(char* arreglo, int size) //conversión de string a caracter mediante concatenación
 {
     string s = "";
