@@ -39,7 +39,7 @@ void crear_producto(productos produc,string inventario);
 void archivoproducto (string inventario, productos produc);
 string convertToString(char* arreglo, int size);
 productos buscar(string archivo, productos produc);
-void buscarcodigo();
+void buscarcodigo(int autoincremental,productos produc,string inventario);
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);
 //--DESARROLLO DEL MAIN---------------------------------------------------------------------------
 int main()
@@ -155,6 +155,7 @@ int main()
                                             case 4:
                                                 cout<<"Abriendo función de administrar productos..."<<endl;
                                                 crear_producto(produc,inventario);
+                                                buscar(inventario,produc);
                                                 break;
                                             case 5:
                                                 cout<<"Abriendo la función de despacho de compras..."<<endl;
@@ -508,7 +509,7 @@ void buscarcodigo(int autoincremental,productos produc,string inventario)
     tem.open( inventario, ios::binary|ios::in );       //abriendo el archivo, en forma binaria y con entrada
     tem.seekg((ios::end));       //ingresando el numero para poner la aguja dependiendo de lo que busque el usuario
     tem.read((char *) &produc,sizeof(produc));       //leer en la forma binaria, para leer el contenido que esta en el apuntador y moviendose respecto al tamaño
-    autoincremental=produc.codigo;
+    if(produc.codigo!=0)  //CONTINUAR AQUÍ DAVID    
     tem.close();
     return;     
 }
