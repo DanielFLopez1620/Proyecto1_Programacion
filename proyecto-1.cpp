@@ -1,5 +1,5 @@
 //---LIBRERÍAS:------------------------------------------------------------------------------------
-#include<iostream>
+#include<iostream> //Libreria general, entradas y salidas
 #include<locale.h>   //librería de configuración regional
 #include<fstream>
 #include<string.h> 
