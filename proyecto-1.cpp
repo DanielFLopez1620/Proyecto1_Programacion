@@ -35,10 +35,10 @@ void menu_general();
 void menu_admin();
 void menu_client();
 void menu_consul();
-void compra_producto();
-void archivoproducto ();
+void crear_producto(productos produc,string inventario);
+void archivoproducto (string inventario, productos produc);
 string convertToString(char* arreglo, int size);
-productos buscar();
+productos buscar(string archivo, productos produc);
 void buscarcodigo();
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);
 //--DESARROLLO DEL MAIN---------------------------------------------------------------------------
@@ -66,6 +66,7 @@ int main()
     apaux = &aux; // auxiliar para nombres
     char buscado[ML]={' '};  // vector auxiliar para compatibilidad con registros
     long direccion,ubicaciones[ML];  // arreglo de direcciones para cambio
+    productos produc;//variable para inicializar el listado del producto;
     do
     {
         menu_general();
@@ -153,6 +154,7 @@ int main()
                                                 break;
                                             case 4:
                                                 cout<<"Abriendo función de administrar productos..."<<endl;
+                                                crear_producto(produc,inventario);
                                                 break;
                                             case 5:
                                                 cout<<"Abriendo la función de despacho de compras..."<<endl;
@@ -181,7 +183,6 @@ int main()
                                                 cout<<"Eligio realizar una compra..."<<endl;
                                                 cout<<" Hola querido "<<registro.nombre<<endl;
                                                 cout<< "A continuacion se le mostrara todos los productos en los que podra realizar su compra: "<<endl;
-                                                
                                                 
                                                 break;
                                             case 2:
@@ -392,7 +393,7 @@ int main()
     cout<<"Vuelva pronto : )"<<endl;
     return 0;   
 }
-//--DEFINICIÓN DE FUNCIONES------------------------------------------------------------------------
+//--DEFINICIÓN DE FUNCIONES--------------------------------------------------------------------------------------------------------------------
 void menu_general()   // menu inicial
 {
     cout<<"*********************************"<<endl;
@@ -446,7 +447,7 @@ void menu_consul()   // menu del consultor
     cout<<"*********************************"<<endl;
     return;  //return final
 }
-void compra_producto(productos produc,string inventario)
+void crear_producto(productos produc,string inventario)
 {
     int autoincremental;
     cout<<"Ingrese el nombre del producto: "<<endl;
@@ -461,14 +462,13 @@ void compra_producto(productos produc,string inventario)
     cout<<"El codigo del producto es: "<<endl;
     cout<<autoincremental;
     produc.codigo=autoincremental+1;
-    archivoproducto();
+    archivoproducto(inventario,produc);
     return;
 }
 void archivoproducto(string inventario, productos produc)
 {
-    string archivo = "inventario.txt";
     fstream tem;
-    tem.open(archivo.c_str(), ios::binary | ios::app);
+    tem.open(inventario.c_str(), ios::binary | ios::app);
     if(!tem.eof())
     {
         tem.write((char *) &produc,sizeof(produc));
@@ -496,7 +496,7 @@ productos buscar (string archivo, productos produc)
             cout<<" la posicion en el archivo es: "<<i+1<<endl;
             nombre=convertToString(produc.nombre,ML);
             cout<<"nombre "<< nombre<<" categoria: "<< produc.categoria <<" precio "<<produc.precio <<" disponibilidad "<<produc.disponibilidad<<endl;
-            cout<<" ventas "<< produc.ventas <<" codigo "<<produc.codigo<<" "<<endl;
+            cout<<" codigo "<<produc.codigo<<" "<<endl;
         }
         i=i+1;
     } 
@@ -522,6 +522,40 @@ string convertToString(char* arreglo, int size) //conversión de string a caract
     }
     return s;
 }
+/*
+void actualizacion_archivo()
+{
+    usuarios.open(nombre,ios::binary | ios::out |ios::in);  // abrir archivo en los tres modos
+    if(usuarios.is_open())
+        {
+            encontrado = false;
+            while(!usuarios.eof())
+            {
+                usuarios.read(registro.nombre,sizeof(registro.nombre));
+                usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
+                usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                usuarios.read(registro.fecha,sizeof(registro.fecha));
+                aux = convertToString(registro.nombre,ML);
+                strcpy(buscado,aux.c_str());  // conversión de apoyo
+                aux = convertToString(buscado,ML);  // paso a string para mejor comparación
+                if(user == aux)  // buscar nuevamente la concidencia
+                {
+                    encontrado=true;
+                    direccion = usuarios.tellp();  //asignar la dirección actual en registros
+                    letra = 'b'; // cambio de letra para bloqueo de usuarios
+                    usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
+                    registro.cuenta = letra; 
+                    usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
+                    break;
+                }
+            }
+        }
+    else
+        cout<<"Ha ocurrido un problema la bloquear al usuario"<<endl;
+    return;
+}
+*/
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio)
 {
     int elec,con = 0;
