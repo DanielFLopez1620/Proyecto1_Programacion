@@ -86,11 +86,7 @@ int main()
                     encontrado= borrada = false;
                     while(!usuarios.eof())
                     {
-                        usuarios.read(registro.nombre,sizeof(registro.nombre));
-                        usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
-                        usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                        usuarios.read((char *)&registro.cuenta,sizeof(registro.cuenta));
-                        usuarios.read(registro.fecha,sizeof(registro.fecha));
+                        usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
                         user = convertToString(registro.nombre,ML);
                         strcpy(buscado,aux.c_str());  // paso a arreglo para igualar tamanios
                         aux = convertToString(buscado,ML);  // convertir a string para permitir comparación
@@ -253,11 +249,7 @@ int main()
                                 encontrado = false;
                                 while(!usuarios.eof())
                                 {
-                                    usuarios.read(registro.nombre,sizeof(registro.nombre));
-                                    usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
-                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                                    usuarios.read(registro.fecha,sizeof(registro.fecha));
+                                    usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
                                     aux = convertToString(registro.nombre,ML);
                                     if(user == aux)  // buscar nuevamente la concidencia
                                     {
@@ -278,7 +270,6 @@ int main()
                             else
                                 cout<<"Ha ocurrido un problema con el cambio..."<<endl;
                             usuarios.close();
-                            //PENDIENTE DEFINIR EL CAMBIO DE ROL
                         }
                         else  // else en caso de bloque de usuario
                         {
@@ -290,12 +281,7 @@ int main()
                                 encontrado = false;
                                 while(!usuarios.eof())
                                 {
-                                    usuarios.read(registro.nombre,sizeof(registro.nombre));
-                                    usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
-                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                                    usuarios.read(registro.fecha,sizeof(registro.fecha));
-                                    aux = convertToString(registro.nombre,ML);
+                                    usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
                                     strcpy(buscado,aux.c_str());  // conversión de apoyo
                                     aux = convertToString(buscado,ML);  // paso a string para mejor comparación
                                     if(user == aux)  // buscar nuevamente la concidencia
@@ -354,11 +340,7 @@ int main()
                     nuevo.tipo = letra;
                     nuevo.cuenta = 'e';
                     strcpy(nuevo.fecha,date);
-                    generar.write(nuevo.nombre,sizeof(nuevo.nombre));
-                    generar.write(nuevo.contrasena,sizeof(nuevo.contrasena));
-                    generar.write((char *)&nuevo.tipo,sizeof(nuevo.tipo));
-                    generar.write((char *)&nuevo.cuenta,sizeof(nuevo.cuenta));
-                    generar.write(nuevo.fecha,sizeof(nuevo.fecha)); //escritura de datos en archivo
+                    generar.write((char *)&nuevo,sizeof(nuevo)); //escritura de datos en archivo mediante estructura
                     cout<<"Usuario creado correctamente, para estar activo requiere validación de un admin...Este pendiente de esto"<<endl;
                 }
                 else
@@ -526,34 +508,7 @@ string convertToString(char* arreglo, int size) //conversión de string a caract
 /*
 void actualizacion_archivo()
 {
-    usuarios.open(nombre,ios::binary | ios::out |ios::in);  // abrir archivo en los tres modos
-    if(usuarios.is_open())
-        {
-            encontrado = false;
-            while(!usuarios.eof())
-            {
-                usuarios.read(registro.nombre,sizeof(registro.nombre));
-                usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
-                usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                usuarios.read(registro.fecha,sizeof(registro.fecha));
-                aux = convertToString(registro.nombre,ML);
-                strcpy(buscado,aux.c_str());  // conversión de apoyo
-                aux = convertToString(buscado,ML);  // paso a string para mejor comparación
-                if(user == aux)  // buscar nuevamente la concidencia
-                {
-                    encontrado=true;
-                    direccion = usuarios.tellp();  //asignar la dirección actual en registros
-                    letra = 'b'; // cambio de letra para bloqueo de usuarios
-                    usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
-                    registro.cuenta = letra; 
-                    usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
-                    break;
-                }
-            }
-        }
-    else
-        cout<<"Ha ocurrido un problema la bloquear al usuario"<<endl;
+    //--Mejorar y actualizar mediante funciones
     return;
 }
 */
@@ -573,16 +528,12 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
         con = 0;
         while(!busqueda.eof())  // mientras el archivo no termine
         {
-            busqueda.read(enlista[con].nombre,sizeof(enlista[con].nombre));
-            busqueda.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
-            busqueda.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
-            busqueda.read((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
-            busqueda.read(enlista[con].fecha,sizeof(enlista[con].fecha));
+            busqueda.read((char *)&enlista[con],sizeof(enlista[con]));  // lectura comprimida mediante la estructura en lista
             ubicaciones[con] = busqueda.tellg(); // guardado de posición para cambio
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
             {
                 cout<<endl<<"Nombre: "<<enlista[con].nombre<<endl;
-                cout<<"Contraseña: *******"<<endl; //No se despliega la contraseña pues es privada
+                cout<<"Contraseña: *******"<<endl; //No se despliega la contraseña puesto que es privada
                 cout<<"Tipo: "<<enlista[con].tipo<<endl;
                 cout<<"Cuenta: "<<enlista[con].cuenta<<endl;
                 cout<<"Creación: "<<enlista[con].fecha<<endl;
@@ -613,11 +564,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                 hallar = convertToString(conversor,ML);  // conversión a un arreglo de tamaño equivalente a la propiedad nombre de la estructura
                 while (!busqueda.eof())  // mientras el archivo no termine
                 {
-                    busqueda.read(temporal.nombre,sizeof(temporal.nombre));
-                    busqueda.read(temporal.contrasena,sizeof(temporal.contrasena));  //lectura de registros mediante estructuras
-                    busqueda.read((char *)&temporal.tipo,sizeof(temporal.tipo));
-                    busqueda.read((char *)&temporal.cuenta,sizeof(temporal.cuenta));
-                    busqueda.read(temporal.fecha,sizeof(temporal.fecha));
+                    busqueda.read((char *)&enlista[con],sizeof(enlista[con]));  // lectura comprimida mediante la estructura en lista
                     nom = convertToString(temporal.nombre,ML); // conversión de nombre a string
                     //cout<<nom<<"-"<<hallar<<endl;  // muestre aquí para verificar la comparación
                     if(nom==hallar)  // comparación y validación para cambio
