@@ -1,14 +1,14 @@
-//---LIBRERÍAS:------------------------------------------------------------------------------------
+//---LIBRERÍAS:--------------------------------------------------------------------------------------------------------------------------
 #include<iostream> //Libreria general, entradas y salidas
 #include<locale.h>   //librería de configuración regional
-#include<fstream>
-#include<string.h> 
-#include<string>  // librerías
+#include<fstream>  // librería para el manejo de archivos y streams
+#include<string.h>   // librería de manejo de cadenas
+#include<string>  // librerías para más métodos de manejo de cadenas
 #include<time.h>  //librería de manejo de tiempo y fechas
 using namespace std;
-//--ESTRUCUTURAS: ---------------------------------------------------------------------------------
+//--ESTRUCUTURAS: ------------------------------------------------------------------------------------------------------------------------
 const int ML = 30;
-struct personal
+struct personal  // estructura de manejo de usuarios
 {
     char nombre[ML]={' '};
     char contrasena[ML]={' '};
@@ -16,7 +16,8 @@ struct personal
     char cuenta = 'e';
     char fecha[ML]={' '};
 };
-struct productos{
+struct productos  // estrucutura que almacena los productos
+{
     char nombre[ML]={' '};
     char categoria={' '};
     int precio=0;
@@ -24,24 +25,24 @@ struct productos{
     int ventas=0;
     int codigo=0;
 };
-struct listado
+struct listado  // estructura de mostrado para las listas del consultor
 {
     char nombre[ML]={' '};
     int precio_ind=0;
     int cantidad_compra=0;
 };
-//--PROTOTIPOS DE FUNCIONES:-----------------------------------------------------------------------
-void menu_general();
-void menu_admin();
-void menu_client();
-void menu_consul();
-void crear_producto(productos produc,string inventario);
-void archivoproducto (string inventario, productos produc);
-string convertToString(char* arreglo, int size);
-productos buscar(string archivo, productos produc);
-void buscarcodigo(int autoincremental,productos produc,string inventario);
-void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);
-//--DESARROLLO DEL MAIN---------------------------------------------------------------------------
+//--PROTOTIPOS DE FUNCIONES:---------------------------------------------------------------------------------------------------------------
+void menu_general();  // función para desplegar el menú inicial
+void menu_admin();   // función para desplegar el menú específico del administrador
+void menu_client();  // función que muestra el menú del cliente
+void menu_consul();  // fucnión que muestra las opciones para el consultor
+void crear_producto(productos produc,string inventario);  // función para crear productos en inventario
+void archivoproducto (string inventario, productos produc);  // función para...
+string convertToString(char* arreglo, int size);  // función de manejo de cadenas, paso de vecotr char a string
+productos buscar(string archivo, productos produc);  // buscar un producto en archivo de inventario
+void buscarcodigo(int autoincremental,productos produc,string inventario);  // buscar un producto en archivo mediante su código
+void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);  // función para el cambio de permisos de usuarios
+//--DESARROLLO DEL MAIN----------------------------------------------------------------------------------------------------------------------
 int main()
 {
     setlocale(LC_ALL,"");  //configuración de región
@@ -500,9 +501,7 @@ string convertToString(char* arreglo, int size) //conversión de string a caract
 {
     string s = "";
     for (int i = 0; i < size; i++)
-    {
-        s = s + arreglo[i];
-    }
+        s = s + arreglo[i];  // concatenación de char o letras a un string
     return s;
 }
 /*
@@ -516,11 +515,11 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
 {
     int elec,con = 0;
     string nom,fecha,hallar;
-    bool hallado;
+    bool hallado; // booleano para verificar el usuario
     long dir;
-    char conversor[ML]={' '};
+    char conversor[ML]={' '};  // conversor de char de apoyo
     personal temporal;
-    fstream busqueda;
+    fstream busqueda;  // stream para el manejo de archivo
     //Primera apertura para búsqueda de usuarios con la condiicion "letra":
     busqueda.open(nombre, ios::binary | ios::in | ios::out);  // abrir el archivo en los tres modos
     if(busqueda.is_open()) //verificación de apertura de archivo
