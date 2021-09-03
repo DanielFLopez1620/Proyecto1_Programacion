@@ -1,3 +1,4 @@
 #Ignorar los archivos ejecutables:
 *.exe
 *.o
+*.json
