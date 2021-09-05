@@ -68,7 +68,7 @@ int main()
     char buscado[ML]={' '};  // vector auxiliar para compatibilidad con registros
     long direccion,ubicaciones[ML];  // arreglo de direcciones para cambio
     productos produc;//variable para inicializar el listado del producto;
-    do
+    do// Inicio 
     {
         menu_general();
         cout<<"Digite su opción: ";
