@@ -74,8 +74,8 @@ int main()
     string nombre = "perfiles.txt"; //nombre del archivo de usario
     string inventario = "inventario.txt";  // nombre del archivo de los productos
     string recibos = "historial.txt";  //nombre de archivo para recibos y facturas
-    string aux,*apaux,user,password,persona; //cadenas para la lectura de teclado y asignaciones
-    fstream usuarios,generar;   // stream para el manejo de archivos
+    string aux,*apaux,user,password,persona,seleccion; //cadenas para la lectura de teclado y asignaciones
+    fstream usuarios,generar,abastecer;   // stream para el manejo de archivos
     //para imprimeir el tiempo usar el comando asctime(timeinfo);
     alec = &lec;  // variable y puntero del menu general
     avar = &var;  // variable y puntero de menus privados
@@ -166,8 +166,53 @@ int main()
                                                 break;
                                             case 4:
                                                 cout<<"Abriendo función de administrar productos..."<<endl;
-                                                crear_producto(produc,inventario);
-                                                buscar(inventario,produc);
+                                                cout<<"¿Qué desea hacer?\n1)Crear producto\n2)Abastecer producto\nPara salir un numero diferente"<<endl;
+                                                switch (lec)
+                                                {
+                                                case 1:
+                                                    cout<<"Cargando formato de generación..."<<endl;
+                                                    crear_producto(produc,inventario);
+                                                    buscar(inventario,produc);
+                                                    break;
+                                                case 2:
+                                                    cout<<"Cargando inventario..."<<endl;
+                                                    abastecer.open(inventario,ios::binary | ios::in |ios::out);  // apertura del archivo en los tres modos
+                                                    if(abastecer.is_open())
+                                                    {
+                                                        encontrado = false;
+                                                        cout<<"Digite el producto a abastecer: ";
+                                                        cin>> aux;
+                                                        strcpy(date,aux.c_str());
+                                                        convertToString(date,ML);  // cuadre para comparación válida
+                                                        while(!abastecer.eof())
+                                                        {
+                                                            abastecer.read((char *)&produc,sizeof(produc));  //lectura de registro
+                                                            seleccion = convertToString(produc.nombre,ML);  
+                                                            if(aux == seleccion)
+                                                            {
+                                                                encontrado = true;
+                                                                cout<<"Producto encontrado...\nDigite la cantidad a abastecer: ";
+                                                                cin>> con; // lectura de cantidad
+                                                                produc.disponibilidad += con;
+                                                                cout<<"Cambio = "<<produc.disponibilidad<<endl;
+                                                                abastecer.seekp(abastecer.tellg() - (sizeof(produc.codigo)+sizeof(produc.ventas)+sizeof(produc.disponibilidad)));  // volver a posición de disponibilidad
+                                                                abastecer.write((char *)&produc.disponibilidad,sizeof(produc.disponibilidad));  // efectuar escritura
+                                                                break;
+                                                            }
+                                                        }
+                                                        if(encontrado)
+                                                            cout<<"Cambios realizadso correctamente..."<<endl;
+                                                        else
+                                                            cout<<"No se ha encontrado el producto...\n Volviendo al menú"<<endl;
+                                                    }
+                                                    else
+                                                        cout<<"No se ha podido acceder al inventario..."<<endl;
+                                                    break;
+                                                default:
+                                                    cout<<"Volviendo al menú del admin"<<endl;
+                                                    break;
+                                                }
+                                                
                                                 break;
                                             case 5:
                                                 cout<<"Abriendo la función de despacho de compras..."<<endl;
