@@ -8,6 +8,7 @@
 using namespace std;
 //--ESTRUCUTURAS: ------------------------------------------------------------------------------------------------------------------------
 const int ML = 30;
+const int May = 5;
 struct personal  // estructura de manejo de usuarios
 {
     char nombre[ML]={' '};
@@ -25,12 +26,20 @@ struct productos  // estrucutura que almacena los productos
     int ventas=0;
     int codigo=0;
 };
-struct listado  // estructura de mostrado para las listas del consultor
+struct recibo
 {
     char nombre[ML]={' '};
     int precio_ind=0;
     int cantidad_compra=0;
 };
+struct Factura
+{
+    recibo escogidos [May];
+    int precio_total=0;
+    bool estado_de_orden=false;
+    bool estado_de_compra=false;
+}Factu;
+
 //--PROTOTIPOS DE FUNCIONES:---------------------------------------------------------------------------------------------------------------
 void menu_general();  // función para desplegar el menú inicial
 void menu_admin();   // función para desplegar el menú específico del administrador
@@ -42,6 +51,12 @@ string convertToString(char* arreglo, int size);  // función de manejo de caden
 productos buscar(string archivo, productos produc);  // buscar un producto en archivo de inventario
 void buscarcodigo(int autoincremental,productos produc,string inventario);  // buscar un producto en archivo mediante su código
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);  // función para el cambio de permisos de usuarios
+void Realizar_una_compra (productos produc, string inventario, recibo compras[], string recibos);
+void Cancelar_una_compra ();
+void Valor_total_de_compra();
+void Cantidad_de_productos ();
+void Total_de_ventas();
+void Producto_mas_vendido(recibo compras[]);
 //--DESARROLLO DEL MAIN----------------------------------------------------------------------------------------------------------------------
 int main()
 {
@@ -49,7 +64,7 @@ int main()
     int var,*avar,lec,*alec,con=0;  //punteros y variables de manejo de menu;
     char opt,letra,cambio;  //auxiliares y apoyos en el manejo del menu;
     bool encontrado,correcta,permitido,borrada,acambiar; // booleanos del programa
-    listado compras[ML];   // estrucutura para recibos
+    recibo compras[ML];   // estrucutura para recibos
     personal nuevo,registro,enlista[ML]; //estructura de personal para nuevos usuarios
     time_t actual;    //variable de tipo tiempo
     struct tm * timeinfo;  //estructura de tiempo que abarca desde segundo a mes--> tm_(type)
@@ -68,7 +83,7 @@ int main()
     char buscado[ML]={' '};  // vector auxiliar para compatibilidad con registros
     long direccion,ubicaciones[ML];  // arreglo de direcciones para cambio
     productos produc;//variable para inicializar el listado del producto;
-    do// Inicio 
+    do// Inicio     
     {
         menu_general();
         cout<<"Digite su opción: ";
@@ -181,16 +196,19 @@ int main()
                                                 cout<<"Eligio realizar una compra..."<<endl;
                                                 cout<<" Hola querido "<<registro.nombre<<endl;
                                                 cout<< "A continuacion se le mostrara todos los productos en los que podra realizar su compra: "<<endl;
-                                                
+                                                Realizar_una_compra (produc, inventario, compras, recibos);         
                                                 break;
                                             case 2:
                                                 cout<<"Eligio la opción de cancelar compra..."<<endl;
+                                                Cancelar_una_compra ();
                                                 break;
                                             case 3:
                                                 cout<<"Calculando el total de la compra..."<<endl;
+                                                Valor_total_de_compra();
                                                 break;
                                             case 4:
                                                 cout<<"Mostrando la cantidad de productos comprados..."<<endl;
+                                                Cantidad_de_productos ();
                                                 break;
                                             case 5:
                                                 cout<<"Saliendo de la sesión..."<<endl;
@@ -220,9 +238,11 @@ int main()
                                                 break;
                                             case 3:
                                                 cout<<"Calculando el total de ventas del programa..."<<endl;
+                                                Total_de_ventas();
                                                 break;
                                             case 4:
                                                 cout<<"Buscando el producto más vendido..."<<endl;
+                                                Producto_mas_vendido(compras);
                                                 break;
                                             case 5:
                                                 cout<<"Saliendo de la sesión..."<<endl;
@@ -374,7 +394,7 @@ int main()
                 break;
         }
     }while (lec!=5);
-    cout<<"Vuelva pronto : )"<<endl;
+    cout<<"Vuelva pronto : "<<endl;
     return 0;   
 }
 //--DEFINICIÓN DE FUNCIONES--------------------------------------------------------------------------------------------------------------------
@@ -540,7 +560,6 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                 con++;  // contador de coincidencias
             }
         }
-        
     }
     else
         cout<<"Ha ocurrido un problema con el archivo"<<endl;
@@ -597,5 +616,190 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             cout<<"Ha ocurrido un problmea con las asignación..."<<endl; // mensaje de error en caso de apertura del archivo
         busqueda.close();
     } while (elec!=3 && elec!=4);  // hacer mientras no se indique lo contrario
+    return;
+}
+void Realizar_una_compra (productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion)
+{
+    long ayuda, actual;
+    char respuesta;
+    bool encontrado=false;
+    int contaux=0, aux=0,confirmar=0, cambiar=0,total;
+    ofstream guardar;
+    productos temporal;
+    ifstream Leer;
+    fstream busca;
+    Leer.open(inventario.c_str(), ios::binary | ios::app);
+    Leer.read((char *)&produc,sizeof(produc));
+    
+    cout<< "Mira los respectivos productos: "<<endl;
+    cout <<"(Maximo 5 productos)"<<endl;
+    while(!Leer.eof())//Revisamos el archivo hasta el final
+    {
+        aux=0;
+        cout<<"----------------------------"<<endl;
+        cout<<"Producto:               "<<produc.nombre <<endl;
+        cout<<"Categoria:              "<<produc.categoria<<endl;
+        cout<<"Precio:                 "<<produc.precio <<endl;
+        cout<<"Disponibilidad:         "<<produc.disponibilidad <<endl;
+        cout<<"Codigo del producto:    "<<produc.codigo <<endl;
+        cout<<"----------------------------"<<endl;
+        cout<<endl;
+        confirmar=produc.codigo;
+
+        cout<<"Desea comprar este producto (s/n)"<<endl;
+        cin>>respuesta;
+        while (respuesta!='s'|| respuesta!='n')
+        {
+            cout<<" Porfavor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+            cin>>respuesta;
+        }
+        if(respuesta=='s')
+        {
+            if (contaux<5)
+            {
+
+                guardar.open(recibos, ios :: binary);
+
+                if(guardar.fail())
+                {
+                    cout<< "No se puede abrir el archivo";
+                }
+
+             cout<< "Porfavor ingrese el numero de productos que desea obtener: "<<endl;
+             cin>> aux;
+             while (aux>produc.disponibilidad)
+             {
+                cout<<" Esto no es posible debido a que no hay tantos de este producto "<<endl;
+                cout<<" Porfavor vuelva a ingrese el numero de productos que desea: "<<endl;
+                cin>> aux;
+             }
+             strcpy(Factu.escogidos[contaux].nombre,produc.nombre);
+             cambiar=produc.disponibilidad-aux;
+             produc.disponibilidad=cambiar;
+             Factu.escogidos[contaux].precio_ind=produc.precio;
+             Factu.escogidos[contaux].cantidad_compra+=aux;
+             total=cambiar*produc.precio;
+             total+=total;
+
+                 busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
+                if(busca.is_open()) //verificación de apertura de archivo
+                {
+                    encontrado=false;
+                    while(!busca.eof())  // mientras el archivo no termine
+                    {
+                        busca.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
+                        direccion = busca.tellg(); // guardado de posición para cambio
+                        if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                        {
+                            cout<<"Encontrado"<<endl;
+                            encontrado=true;
+                            ayuda=busca.tellg();
+                            busca.seekp(ayuda-(sizeof(temporal.disponibilidad)));
+
+                            temporal.disponibilidad=cambiar;
+                        }
+                        busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
+                    }
+                }
+                else{
+                    cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                }
+                busca.close();
+               /*actual = inventarteio.tellg();
+               inventario.seekg(actual);*/
+
+            }
+            contaux++;
+            cout <<" Ya alcanzo los 5 productos "<<endl;
+            break;
+        }
+        Leer.read((char *)&produc,sizeof(produc));
+    }
+
+    Factu.precio_total = total;
+    Factu.estado_de_orden=true;
+    guardar.write((char *)&Factu,sizeof(Factu));
+    Leer.close();
+    
+    return;
+}
+void Cancelar_una_compra ()
+{
+   /* fstream modificar, temporal;
+    modificar.open(nombreArchivo,ios::in);
+    temporal.open(archivoTemporal,ios::out);
+    bool encontrado=false;
+    cout<<"Ingrese su identificador a buscar"<<endl;
+    cin>>buscar;
+    modificar>>palabra1>>palabra2>>identificador;
+    while(!modificar.eof())
+    {
+
+        if(identificador!=buscar)
+        {
+            temporal<<palabra1<<" "<<palabra2<<" "<<identificador<<endl;
+        }
+        else
+        {
+            encontrado=true;
+        }
+        modificar>>palabra1>>palabra2>>identificador;
+    }
+    if(encontrado==false)
+    {
+        cout<<"Identificador no encontrado"<<endl;
+    }
+    modificar.close();//Cerramos lo de modificar
+    temporal.close();//Y cerramos temporal
+    modificar.open(nombreArchivo,ios::out | ios::trunc);
+    temporal.open(archivoTemporal,ios::in);
+    temporal>>palabra1>>palabra2>>identificador;
+    while(!temporal.eof())//Revisamos el archivo
+    {
+        modificar<<palabra1<<" "<<palabra2<<" "<<identificador<<endl;
+        temporal>>palabra1>>palabra2>>identificador;//Trasncribimos
+    }
+    modificar.close();//cerramos
+    temporal.close();//cerammos
+    cout<<"Informacion borrada con exito"<<endl;
+    Sleep(1500);
+    Sleep(1500);
+    return;*/
+}
+void Valor_total_de_compra()
+{
+    
+
+    return;
+}
+void Cantidad_de_productos ()
+{
+
+
+    return;
+}
+void Total_de_ventas()
+{
+
+    return;
+}
+void Producto_mas_vendido(recibo compras[])
+{
+    int contador[100]= {0};
+    int mayor=0, aux=0;
+    for(int i=0;i<ML;i++)
+    {
+            if(compras[i].cantidad_compra>=0)
+            {
+                mayor=compras[i].cantidad_compra;
+            }
+            aux=compras[i].cantidad_compra;
+            if(mayor<aux)
+                {
+                    mayor=aux;
+                }
+    }
+    cout<<" El producto con mayor ventas " <<mayor<<endl;
+
     return;
 }
