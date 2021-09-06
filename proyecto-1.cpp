@@ -51,7 +51,7 @@ void crear_producto(productos produc,string inventario);  // función para crear
 void archivoproducto (string inventario, productos produc);  // función para...
 string convertToString(char* arreglo, int size);  // función de manejo de cadenas, paso de vecotr char a string
 productos buscar(string archivo, productos produc);  // buscar un producto en archivo de inventario
-void buscarcodigo(int autoincremental,productos produc,string inventario);  // buscar un producto en archivo mediante su código
+int buscarcodigo(productos produc,string inventario);  // buscar un producto en archivo mediante su código
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);  // función para el cambio de permisos de usuarios
 void Realizar_una_compra (productos produc, string inventario, recibo compras[], string recibos);
 void Cancelar_una_compra ();
@@ -500,7 +500,12 @@ void menu_consul()   // menu del consultor
 }
 void crear_producto(productos produc,string inventario)
 {
-    int autoincremental;
+   int autoincremental=0;
+    fstream tem;
+    tem.open(inventario.c_str(), ios::binary | ios::app);
+
+    tem.seekg(0,ios::end);
+
     cout<<"Ingrese el nombre del producto: "<<endl;
     cin>>produc.nombre;
     cout<<"Ingrese la categoria del producto: "<<endl;
@@ -509,11 +514,14 @@ void crear_producto(productos produc,string inventario)
     cin>>produc.precio;
     cout<<"Ingrese la disponibilidad del producto: "<<endl;
     cin>>produc.disponibilidad;
-    buscarcodigo(autoincremental,produc,inventario);
-    cout<<"El codigo del producto es: "<<endl;
-    cout<<autoincremental;
+    autoincremental=buscarcodigo(produc,inventario);
+    cout<<"El codigo del producto es: ";
     produc.codigo=autoincremental+1;
+    cout<<produc.codigo<<endl;
     archivoproducto(inventario,produc);
+
+
+   tem.close();
     return;
 }
 void archivoproducto(string inventario, productos produc)
@@ -524,16 +532,16 @@ void archivoproducto(string inventario, productos produc)
     {
         tem.write((char *) &produc,sizeof(produc));
     }
-    else 
+    else
     {
-        cout<<"Error em la apertura de archivo"<<endl;   
+        cout<<"Error em la apertura de archivo"<<endl;
     }
     tem.close();
     return;
     }
 productos buscar (string archivo, productos produc)
 {
-    productos ejemplo;  //borrar para después
+   productos ejemplo;  //borrar para después
     int i=0;
     string nombre="";
     fstream tem;
@@ -548,21 +556,27 @@ productos buscar (string archivo, productos produc)
             nombre=convertToString(produc.nombre,ML);
             cout<<"nombre "<< nombre<<" categoria: "<< produc.categoria <<" precio "<<produc.precio <<" disponibilidad "<<produc.disponibilidad<<endl;
             cout<<" codigo "<<produc.codigo<<" "<<endl;
+
         }
         i=i+1;
-    } 
+    }
+    tem.close();
     return ejemplo;
 }
-void buscarcodigo(int autoincremental,productos produc,string inventario)
+int buscarcodigo(productos produc,string inventario)
 {
+    int tamyo, autoincremental;
     fstream tem;
-    tem.open( inventario, ios::binary|ios::in );       //abriendo el archivo, en forma binaria y con entrada
-    tem.seekg((ios::end));       //ingresando el numero para poner la aguja dependiendo de lo que busque el usuario
-    tem.read((char *) &produc,sizeof(produc));       //leer en la forma binaria, para leer el contenido que esta en el apuntador y moviendose respecto al tamaño
-    if(produc.codigo!=0)  //CONTINUAR AQUÍ DAVID    
+    tem.open(inventario,ios::binary | ios::in);
+    tamyo=sizeof(produc);
+    tem.seekg(-tamyo,ios::end);
+    tem.read((char *) &produc,sizeof(produc));
+    autoincremental=produc.codigo;
+
     tem.close();
-    return;     
+    return autoincremental;
 }
+
 
 string convertToString(char* arreglo, int size) //conversión de string a caracter mediante concatenación
 {
