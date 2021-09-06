@@ -53,10 +53,10 @@ string convertToString(char* arreglo, int size);  // función de manejo de caden
 productos buscar(string archivo, productos produc);  // buscar un producto en archivo de inventario
 int buscarcodigo(productos produc,string inventario);  // buscar un producto en archivo mediante su código
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);  // función para el cambio de permisos de usuarios
-void Realizar_una_compra (productos produc, string inventario, recibo compras[], string recibos);
-void Cancelar_una_compra ();
-void Valor_total_de_compra();
-void Cantidad_de_productos ();
+void Realizar_una_compra(productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion);
+void Cancelar_una_compra(string recibos, Factura Factu, long direccion);
+void Valor_total_de_compra(string recibos, Factura Factu);
+void Cantidad_de_productos (string recibos, Factura Factu);
 void Total_de_ventas();
 void Producto_mas_vendido(recibo compras[]);
 //--DESARROLLO DEL MAIN----------------------------------------------------------------------------------------------------------------------
@@ -243,19 +243,19 @@ int main()
                                                 cout<<"Eligio realizar una compra..."<<endl;
                                                 cout<<" Hola querido "<<convertToString(registro.nombre,ML)<<endl;
                                                 cout<< "A continuacion se le mostrara todos los productos en los que podra realizar su compra: "<<endl;
-                                                Realizar_una_compra (produc, inventario, compras, recibos);         
+                                                Realizar_una_compra (produc, inventario, compras, recibos,Factu,direccion);         
                                                 break;
                                             case 2:
                                                 cout<<"Eligio la opción de cancelar compra..."<<endl;
-                                                Cancelar_una_compra ();
+                                                Cancelar_una_compra (recibos,Factu,direccion);
                                                 break;
                                             case 3:
                                                 cout<<"Calculando el total de la compra..."<<endl;
-                                                Valor_total_de_compra();
+                                                Valor_total_de_compra(recibos,Factu);
                                                 break;
                                             case 4:
                                                 cout<<"Mostrando la cantidad de productos comprados..."<<endl;
-                                                Cantidad_de_productos ();
+                                                Cantidad_de_productos (recibos,Factu);
                                                 break;
                                             case 5:
                                                 cout<<"Saliendo de la sesión..."<<endl;
@@ -500,7 +500,7 @@ void menu_consul()   // menu del consultor
 }
 void crear_producto(productos produc,string inventario)
 {
-   int autoincremental=0;
+    int autoincremental=0;
     fstream tem;
     tem.open(inventario.c_str(), ios::binary | ios::app);
 
@@ -521,7 +521,7 @@ void crear_producto(productos produc,string inventario)
     archivoproducto(inventario,produc);
 
 
-   tem.close();
+    tem.close();
     return;
 }
 void archivoproducto(string inventario, productos produc)
@@ -556,7 +556,6 @@ productos buscar (string archivo, productos produc)
             nombre=convertToString(produc.nombre,ML);
             cout<<"nombre "<< nombre<<" categoria: "<< produc.categoria <<" precio "<<produc.precio <<" disponibilidad "<<produc.disponibilidad<<endl;
             cout<<" codigo "<<produc.codigo<<" "<<endl;
-
         }
         i=i+1;
     }
@@ -572,7 +571,6 @@ int buscarcodigo(productos produc,string inventario)
     tem.seekg(-tamyo,ios::end);
     tem.read((char *) &produc,sizeof(produc));
     autoincremental=produc.codigo;
-
     tem.close();
     return autoincremental;
 }
@@ -689,7 +687,6 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
     productos temporal;
     ifstream Leer;
     fstream busca;
-
     Leer.open(inventario.c_str(), ios::binary | ios::app);
     if(Leer.is_open())
     {
@@ -808,7 +805,6 @@ void Cancelar_una_compra (string recibos, Factura Factu, long direccion)
             }
             cout<< "El precio total es de: "<<Factu.precio_total;
             cout<< "El numero de factura es de: "<<Factu.num_factu;
-
             cout<< "Desea cancelar esta factura (s/n)"<<endl;
             cin>>respues;
             do
