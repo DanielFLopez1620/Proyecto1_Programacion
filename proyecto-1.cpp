@@ -34,6 +34,7 @@ struct recibo
 };
 struct Factura
 {
+    char nombre[ML]={' '};
     recibo escogidos [May];
     int precio_total=0;
     int num_factu=0;
@@ -240,7 +241,7 @@ int main()
                                         {
                                             case 1:
                                                 cout<<"Eligio realizar una compra..."<<endl;
-                                                cout<<" Hola querido "<<registro.nombre<<endl;
+                                                cout<<" Hola querido "<<convertToString(registro.nombre,ML)<<endl;
                                                 cout<< "A continuacion se le mostrara todos los productos en los que podra realizar su compra: "<<endl;
                                                 Realizar_una_compra (produc, inventario, compras, recibos);         
                                                 break;
@@ -674,6 +675,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
     productos temporal;
     ifstream Leer;
     fstream busca;
+
     Leer.open(inventario.c_str(), ios::binary | ios::app);
     if(Leer.is_open())
     {
@@ -841,8 +843,6 @@ void Valor_total_de_compra(string recibos, Factura Factu)
             cout<< "El precio total es de: "<<Factu.precio_total;
             cout<< "El numero de factura es de: "<<Factu.num_factu;
         }
-        
-    
     }
 return;
 }
@@ -865,11 +865,10 @@ void Cantidad_de_productos (string recibos, Factura Factu)
             cout<<"----------------------------"<<endl;
             cout<<endl;
             }
-            cout<< "El precio total es de: "<<Factu.precio_total;
-            cout<< "El numero de factura es de: "<<Factu.num_factu;
+            cout<< "El precio total es de: "<<Factu.precio_total<<endl;
+            cout<< "El numero de factura es de: "<<Factu.num_factu<<endl;
         }
-    return;
-}
+    }
     return;
 }
 void Total_de_ventas()
