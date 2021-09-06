@@ -36,6 +36,7 @@ struct Factura
 {
     recibo escogidos [May];
     int precio_total=0;
+    int num_factu=0;
     bool estado_de_orden=false;
     bool estado_de_compra=false;
 }Factu;
@@ -195,7 +196,7 @@ int main()
                                                                 cin>> con; // lectura de cantidad
                                                                 produc.disponibilidad += con;
                                                                 cout<<"Cambio = "<<produc.disponibilidad<<endl;
-                                                                abastecer.seekp(abastecer.tellg() - (sizeof(produc.codigo)+sizeof(produc.ventas)+sizeof(produc.disponibilidad)));  // volver a posición de disponibilidad
+                                                                //abastecer.seekp(abastecer.tellg() - (sizeof(produc.codigo)+sizeof(produc.ventas)+sizeof(produc.disponibilidad)));  // volver a posición de disponibilidad
                                                                 abastecer.write((char *)&produc.disponibilidad,sizeof(produc.disponibilidad));  // efectuar escritura
                                                                 break;
                                                             }
@@ -690,7 +691,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
             cout<<"Codigo del producto:    "<<produc.codigo <<endl;
             cout<<"----------------------------"<<endl;
             cout<<endl;
-            confirmar=produc.codigo;
+            
             cout<<"Desea comprar este producto (s/n)"<<endl;
             cin>>respuesta;
             do
@@ -700,6 +701,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
             }while (respuesta!='s' && respuesta!='n');
             if(respuesta=='s')
             {
+                confirmar=produc.codigo;
                 if (contaux<5)
                 {
                     guardar.open(recibos, ios :: binary);
@@ -709,19 +711,18 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                     }
                     cout<< "Porfavor ingrese el numero de productos que desea obtener: "<<endl;
                     cin>> aux;
-                    while (aux>produc.disponibilidad)
+                    while (aux>produc.disponibilidad || aux<1)
                     {
-                        cout<<" Esto no es posible debido a que no hay tantos de este producto "<<endl;
+                        cout<<" Esto no es posible debido a que no se puede o no hay tantos de este producto "<<endl;
                         cout<<" Porfavor vuelva a ingrese el numero de productos que desea: "<<endl;
                         cin>> aux;
-                        //ESTO ES UN CICLO INFINTO EN EL CASO DE QUE SEA CERO, SE REQUIERE DEFINICIÓN DE CASO
                     }
                     strcpy(Factu.escogidos[contaux].nombre,produc.nombre);
                     cambiar=produc.disponibilidad-aux;
                     produc.disponibilidad=cambiar;
                     Factu.escogidos[contaux].precio_ind=produc.precio;
                     Factu.escogidos[contaux].cantidad_compra+=aux;
-                    total=cambiar*produc.precio;
+                    total=aux*produc.precio;
                     total+=total;
                     busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
                     if(busca.is_open()) //verificación de apertura de archivo
@@ -736,7 +737,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                                 cout<<"Encontrado"<<endl;
                                 encontrado=true;
                                 ayuda=busca.tellg();
-                                busca.seekp(ayuda-(sizeof(temporal.disponibilidad)));
+                                busca.seekp(ayuda-(sizeof(temporal.disponibilidad)-(sizeof(temporal.ventas)-(sizeof(temporal.codigo)))));
                                 temporal.disponibilidad=cambiar;
                             }
                             busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
@@ -746,8 +747,6 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                         cout<<"Ha ocurrido un problema con el archivo"<<endl;
                     busca.close();
                     contaux++;
-                /*actual = inventarteio.tellg();
-                inventario.seekg(actual);*/
                 }
                 if(contaux>=5)
                 {
@@ -759,6 +758,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
         }
         Factu.precio_total = total;
         Factu.estado_de_orden=true;
+        Factu.num_factu=+1;
         guardar.write((char *)&Factu,sizeof(Factu));
     }
     else
@@ -766,55 +766,110 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
     Leer.close();
     return;
 }
-void Cancelar_una_compra ()
+void Cancelar_una_compra (string recibos, Factura Factu, long direccion)
 {
-    /* fstream modificar, temporal;
-    modificar.open(nombreArchivo,ios::in);
-    temporal.open(archivoTemporal,ios::out);
-    bool encontrado=false;
-    cout<<"Ingrese su identificador a buscar"<<endl;
-    cin>>buscar;
-    modificar>>palabra1>>palabra2>>identificador;
-    while(!modificar.eof())
+    ifstream Leer;
+    long ayuda;
+    bool change=false;
+    fstream busca;
+    Factura temporal1;
+    int aux=0;
+    char respues;
+    Leer.open(recibos.c_str(), ios::binary | ios::in);
+    if(Leer.is_open())
     {
-        if(identificador!=buscar)
+        Leer.read((char *)&Factu,sizeof(Factu));
+        cout<< "Mira los respectivos productos comprados: "<<endl;
+        while(!Leer.eof())//Revisamos el archivo hasta el final
         {
-            temporal<<palabra1<<" "<<palabra2<<" "<<identificador<<endl;
+            for(int i=0;i<5;i++){
+            cout<<"----------------------------"<<endl;
+            cout<<"Producto:        "<<i+1<<"  "<<Factu.escogidos[i].nombre <<endl;
+            cout<<"Precio:                 "<<Factu.escogidos[i].precio_ind<<endl;
+            cout<<"Cantidad de producto:   "<<Factu.escogidos[i].cantidad_compra <<endl;
+            cout<<"----------------------------"<<endl;
+            cout<<endl;
+            }
+            cout<< "El precio total es de: "<<Factu.precio_total;
+            cout<< "El numero de factura es de: "<<Factu.num_factu;
+
+            cout<< "Desea cancelar esta factura (s/n)"<<endl;
+            cin>>respues;
+            do
+            {
+                cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                cin>>respues;
+            }while (respues!='s' && respues!='n');
+            if(respues== 's')
+            {
+                busca.open(recibos,ios::binary | ios::out | ios::in);
+                if(busca.is_open()) //verificación de apertura de archivo
+                    {              
+                        busca.read((char *)&Factu,sizeof(Factu));  // lectura comprimida mediante la estructura en lista
+                        direccion = busca.tellg(); // guardado de posición para cambio
+                        ayuda=busca.tellg();
+                        busca.seekp(ayuda-(sizeof(temporal1.estado_de_compra)));
+                        temporal1.estado_de_compra=change;
+                        busca.write((char *)&temporal1.estado_de_compra,sizeof(temporal1.estado_de_compra));
+                    }
+                    else
+                        cout<<"Ha ocurrido un problema con el archivo"<<endl;
+            }
         }
-        else
-        {
-            encontrado=true;
-        }
-        modificar>>palabra1>>palabra2>>identificador;
     }
-    if(encontrado==false)
-    {
-        cout<<"Identificador no encontrado"<<endl;
-    }
-    modificar.close();//Cerramos lo de modificar
-    temporal.close();//Y cerramos temporal
-    modificar.open(nombreArchivo,ios::out | ios::trunc);
-    temporal.open(archivoTemporal,ios::in);
-    temporal>>palabra1>>palabra2>>identificador;
-    while(!temporal.eof())//Revisamos el archivo
-    {
-        modificar<<palabra1<<" "<<palabra2<<" "<<identificador<<endl;
-        temporal>>palabra1>>palabra2>>identificador;//Trasncribimos
-    }
-    modificar.close();//cerramos
-    temporal.close();//cerammos
-    cout<<"Informacion borrada con exito"<<endl;
-    Sleep(1500);
-    Sleep(1500);
-    return;*/
+    busca.close();
+return;
 }
-void Valor_total_de_compra()
+void Valor_total_de_compra(string recibos, Factura Factu)
 {
+    ifstream Leer;
+    Leer.open(recibos.c_str(), ios::binary | ios::in);
+    if(Leer.is_open())
+    {
+        Leer.read((char *)&Factu,sizeof(Factu));
+        cout<< "Mira los respectivos productos comprados: "<<endl;
+        while(!Leer.eof())//Revisamos el archivo hasta el final
+        {
+            for(int i=0;i<5;i++){
+            cout<<"----------------------------"<<endl;
+            cout<<"Producto:        "<<i<<"  "<<Factu.escogidos[i].nombre <<endl;
+            cout<<"Precio:                 "<<Factu.escogidos[i].precio_ind<<endl;
+            cout<<"Cantidad de producto:   "<<Factu.escogidos[i].cantidad_compra <<endl;
+            cout<<"----------------------------"<<endl;
+            cout<<endl;
+            }
+            cout<< "El precio total es de: "<<Factu.precio_total;
+            cout<< "El numero de factura es de: "<<Factu.num_factu;
+        }
+        
     
+    }
+return;
+}
+void Cantidad_de_productos (string recibos, Factura Factu)
+{
+    ifstream Leer;
+    int cont=0;
+    Leer.open(recibos.c_str(), ios::binary | ios::in);
+    if(Leer.is_open())
+    {
+        Leer.read((char *)&Factu,sizeof(Factu));
+        cout<< "Mira los respectivos productos comprados: "<<endl;
+        while(!Leer.eof())//Revisamos el archivo hasta el final
+        {
+            for(int i=0;i<5;i++){
+            cout<<"----------------------------"<<endl;
+            cout<<"Producto:        "<<i<<"  "<<Factu.escogidos[i].nombre <<endl;
+            cout<<"Precio:                  "<<Factu.escogidos[i].precio_ind<<endl;
+            cout<<"Cantidad de producto:    "<<Factu.escogidos[i].cantidad_compra <<endl;
+            cout<<"----------------------------"<<endl;
+            cout<<endl;
+            }
+            cout<< "El precio total es de: "<<Factu.precio_total;
+            cout<< "El numero de factura es de: "<<Factu.num_factu;
+        }
     return;
 }
-void Cantidad_de_productos ()
-{
     return;
 }
 void Total_de_ventas()
