@@ -104,7 +104,12 @@ int main()
                     encontrado= borrada = false;
                     while(!usuarios.eof())
                     {
-                        usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
+                        //usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
+                        usuarios.read(registro.nombre,sizeof(registro.nombre));
+                        usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
+                        usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                        usuarios.read((char *)&registro.cuenta,sizeof(registro.cuenta));
+                        usuarios.read(registro.fecha,sizeof(registro.fecha));
                         user = convertToString(registro.nombre,ML);
                         strcpy(buscado,aux.c_str());  // paso a arreglo para igualar tamanios
                         aux = convertToString(buscado,ML);  // convertir a string para permitir comparación
@@ -350,7 +355,12 @@ int main()
                                 encontrado = false;
                                 while(!usuarios.eof())
                                 {
-                                    usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
+                                    //usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
+                                    usuarios.read(registro.nombre,sizeof(registro.nombre));
+                                    usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
+                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                                    usuarios.read(registro.fecha,sizeof(registro.fecha));
                                     strcpy(buscado,aux.c_str());  // conversión de apoyo
                                     aux = convertToString(buscado,ML);  // paso a string para mejor comparación
                                     if(user == aux)  // buscar nuevamente la concidencia
@@ -504,9 +514,7 @@ void crear_producto(productos produc,string inventario)
     int autoincremental=0;
     fstream tem;
     tem.open(inventario.c_str(), ios::binary | ios::app);
-
     tem.seekg(0,ios::end);
-
     cout<<"Ingrese el nombre del producto: "<<endl;
     cin>>produc.nombre;
     cout<<"Ingrese la categoria del producto: "<<endl;
@@ -520,7 +528,6 @@ void crear_producto(productos produc,string inventario)
     produc.codigo=autoincremental+1;
     cout<<produc.codigo<<endl;
     archivoproducto(inventario,produc);
-
     tem.close();
     return;
 }
@@ -529,16 +536,12 @@ void archivoproducto(string inventario, productos produc)
     fstream tem;
     tem.open(inventario.c_str(), ios::binary | ios::app);
     if(!tem.eof())
-    {
         tem.write((char *) &produc,sizeof(produc));
-    }
     else
-    {
-        cout<<"Error em la apertura de archivo"<<endl;
-    }
+        cout<<"Error en la apertura de archivo"<<endl;
     tem.close();
     return;
-    }
+}
 productos buscar (string archivo, productos produc)
 {
    productos ejemplo;  //borrar para después
@@ -554,8 +557,8 @@ productos buscar (string archivo, productos produc)
         {
             cout<<" la posicion en el archivo es: "<<i+1<<endl;
             nombre=convertToString(produc.nombre,ML);
-            cout<<"nombre "<< nombre<<" categoria: "<< produc.categoria <<" precio "<<produc.precio <<" disponibilidad "<<produc.disponibilidad<<endl;
-            cout<<" codigo "<<produc.codigo<<" "<<endl;
+            cout<<"Nombre "<< nombre<<"\nCategoria: "<< produc.categoria <<"\nPrecio "<<produc.precio <<"\nDisponibilidad "<<produc.disponibilidad<<endl;
+            cout<<"\nCodigo "<<produc.codigo<<" "<<endl;
         }
         i=i+1;
     }
@@ -604,7 +607,12 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
         con = 0;
         while(!busqueda.eof())  // mientras el archivo no termine
         {
-            busqueda.read((char *)&enlista[con],sizeof(enlista[con]));  // lectura comprimida mediante la estructura en lista
+            //busqueda.read((char *)&enlista[con],sizeof(enlista[con]));  // lectura comprimida mediante la estructura en lista
+            busqueda.read(enlista[con].nombre,sizeof(enlista[con].nombre));
+            busqueda.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
+            busqueda.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
+            busqueda.read((char *)&enlista[con].cuenta,sizeof(enlista[con].cuenta));
+            busqueda.read(enlista[con].fecha,sizeof(enlista[con].fecha));
             ubicaciones[con] = busqueda.tellg(); // guardado de posición para cambio
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
             {
@@ -639,7 +647,12 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                 hallar = convertToString(conversor,ML);  // conversión a un arreglo de tamaño equivalente a la propiedad nombre de la estructura
                 while (!busqueda.eof())  // mientras el archivo no termine
                 {
-                    busqueda.read((char *)&enlista[con],sizeof(enlista[con]));  // lectura comprimida mediante la estructura en lista
+                    //busqueda.read((char *)&enlista[con],sizeof(enlista[con]));  // lectura comprimida mediante la estructura en lista
+                    busqueda.read(temporal.nombre,sizeof(temporal.nombre));
+                    busqueda.read(temporal.contrasena,sizeof(temporal.contrasena));  //lectura de registros mediante estructuras
+                    busqueda.read((char *)&temporal.tipo,sizeof(temporal.tipo));
+                    busqueda.read((char *)&temporal.cuenta,sizeof(temporal.cuenta));
+                    busqueda.read(temporal.fecha,sizeof(temporal.fecha));
                     nom = convertToString(temporal.nombre,ML); // conversión de nombre a string
                     //cout<<nom<<"-"<<hallar<<endl;  // muestre aquí para verificar la comparación
                     if(nom==hallar)  // comparación y validación para cambio
@@ -729,14 +742,13 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                         cout<<"Codigo del producto:    "<<produc.codigo <<endl;
                         cout<<"----------------------------"<<endl;
                         cout<<endl;
-                        
                         cout<<"Desea comprar este producto (s/n)"<<endl;
                         cin>>respuesta;
-                        do
+                        while (respuesta!='s' && respuesta!='n')
                         {
                             cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
                             cin>>respuesta;
-                        }while (respuesta!='s' && respuesta!='n');
+                        }
                         if(respuesta=='s')
                         {
                             confirmar=produc.codigo;
@@ -744,9 +756,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                             {
                                 guardar.open(recibos, ios :: binary);
                                 if(guardar.fail())
-                                {
                                     cout<< "No se puede abrir el archivo";
-                                }
                                 cout<< "Porfavor ingrese el numero de productos que desea obtener: "<<endl;
                                 cin>> aux;
                                 while (aux>produc.disponibilidad || aux<1)
@@ -784,7 +794,6 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                                 else
                                 cout<<"Ha ocurrido un problema con el archivo"<<endl;
                                 busca.close();
-
                                 busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
                                 if(busca.is_open()) //verificación de apertura de archivo
                                 {
@@ -826,9 +835,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                 }
             }
             else
-            {
                 cout<< "No se encontro su nombre, porfavor verifique he intente mas tarde "<<endl;
-            }
         }
     }
     else
@@ -838,14 +845,12 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
 }
 void Cancelar_una_compra (productos produc, string inventario, string recibos, Factura Factu, long direccion)
 {
-    
     long ayuda;
     bool change=false;
     bool encontrado;
     productos temporal;
     ifstream Leer;
     fstream busca, busca1;
-    
     Factura temporal1;
     int aux=0, confirmar;
     char respues;
@@ -888,8 +893,8 @@ void Cancelar_una_compra (productos produc, string inventario, string recibos, F
                         busca1.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
                         if(busca1.is_open()) //verificación de apertura de archivo
                         {
-                           encontrado=false;
-                           while(!busca1.eof())  // mientras el archivo no termine
+                            encontrado=false;
+                            while(!busca1.eof())  // mientras el archivo no termine
                             {
                                 busca1.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
                                 direccion = busca.tellg(); // guardado de posición para cambio
