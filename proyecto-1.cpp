@@ -99,6 +99,7 @@ int main()
                 permitido = true;
                 acambiar = false;
                 usuarios.open(nombre,ios::in | ios::binary);  // apertura de archivo en modo binario
+                con = 0;
                 if(usuarios.is_open())
                 {
                     encontrado= borrada = false;
@@ -140,7 +141,7 @@ int main()
                                 break;
                             }
                             con++;
-                        } while (con<=3); // si excede los tres intentos se sabra
+                        } while (con<3); // si excede los tres intentos se sabra
                         if(correcta)  // verificación de la contraseña correcta
                         {
                             opt =registro.tipo;
@@ -317,7 +318,7 @@ int main()
                         else if(acambiar) // else para cambio de rol de usuario
                         {
                             cout<<"El admin a pedido cambio de rol de su cuenta, seleccione un nuevo rol: "<<endl;
-                            usuarios.open(nombre, ios::binary | ios::in |ios::out);
+                            usuarios.open(nombre, ios::binary | ios::in | ios::out);
                             if(usuarios.is_open())
                             {
                                 encontrado = false;
@@ -328,7 +329,7 @@ int main()
                                     if(user == aux)  // buscar nuevamente la concidencia
                                     {
                                         encontrado=true;
-                                        direccion = usuarios.tellp();  //asignar la dirección actual en registros
+                                        direccion = usuarios.tellg();  //asignar la dirección actual en registros
                                         cin>>letra; // cambio de letra para bloqueo de usuarios
                                         usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
                                         do
@@ -349,7 +350,7 @@ int main()
                         {
                             cout<<"Contraseña digitada incorrectamente 3 veces, se bloqueo el usuario..."<<endl;
                             user = convertToString(registro.nombre,ML);
-                            usuarios.open(nombre,ios::binary | ios::out |ios::in);  // abrir archivo en los tres modos
+                            usuarios.open(nombre,ios::binary | ios::out | ios::in);  // abrir archivo en los tres modos
                             if(usuarios.is_open())
                             {
                                 encontrado = false;
@@ -359,14 +360,14 @@ int main()
                                     usuarios.read(registro.nombre,sizeof(registro.nombre));
                                     usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
                                     usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
+                                    usuarios.read((char *)&registro.cuenta,sizeof(registro.cuenta));
                                     usuarios.read(registro.fecha,sizeof(registro.fecha));
                                     strcpy(buscado,aux.c_str());  // conversión de apoyo
                                     aux = convertToString(buscado,ML);  // paso a string para mejor comparación
                                     if(user == aux)  // buscar nuevamente la concidencia
                                     {
                                         encontrado=true;
-                                        direccion = usuarios.tellp();  //asignar la dirección actual en registros
+                                        direccion = usuarios.tellg();  //asignar la dirección actual en registros
                                         letra = 'b'; // cambio de letra para bloqueo de usuarios
                                         usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
                                         registro.cuenta = letra; 
@@ -398,14 +399,14 @@ int main()
                 break;
             case 2:
                 cout<<"Preparandose para crear un nuevo usuario..."<<endl;
-                generar.open(nombre,ios::out | ios::app);
+                generar.open(nombre,ios::out | ios::binary | ios::app);
                 if(generar.is_open())
                 {
                     timeinfo = localtime( &actual); //cambio de formato de tiempo
                     strcpy(date,ctime(&actual)); //cambio a char para ser copiado en date
                     date[10]= date[13] = '_';
                     date[3]=date[7]=date[16]=date[19]='-';  // corrección de formato de fecha
-                    cout<<"Digite su nuevo nombre usuario :";
+                    cout<<"Digite su nuevo nombre usuario: ";
                     getline(cin>>ws,aux); 
                     strcpy(nuevo.nombre,aux.c_str());  // copiado de nombre
                     cout<<"Digite una nueva contraseña: ";
@@ -419,7 +420,12 @@ int main()
                     nuevo.tipo = letra;
                     nuevo.cuenta = 'e';
                     strcpy(nuevo.fecha,date);
-                    generar.write((char *)&nuevo,sizeof(nuevo)); //escritura de datos en archivo mediante estructura
+                    generar.write(nuevo.nombre,sizeof(nuevo.nombre));
+                    generar.write(nuevo.contrasena,sizeof(nuevo.contrasena));
+                    generar.write((char *)&nuevo.tipo,sizeof(nuevo.tipo));
+                    generar.write((char *)&nuevo.cuenta,sizeof(nuevo.cuenta));
+                    generar.write(nuevo.fecha,sizeof(nuevo.fecha)); //escritura de datos en archivo
+                    //generar.write((char *)&nuevo,sizeof(nuevo)); //escritura de datos en archivo mediante estructura
                     cout<<"Usuario creado correctamente, para estar activo requiere validación de un admin...Este pendiente de esto"<<endl;
                 }
                 else
@@ -659,7 +665,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
                     {
                         cout<<"Encontrado"<<endl;
                         hallado = true;
-                        dir = busqueda.tellp(); // guardado de posición para cambio
+                        dir = busqueda.tellg(); // guardado de posición para cambio
                         busqueda.seekp(dir-(sizeof(temporal.fecha)+sizeof(temporal.cuenta)));  // ir a la posición para modificar el caracter de cuenta
                         if(elec == 1)
                         {
@@ -703,7 +709,6 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
     fstream busca;
     Leer.open(inventario.c_str(), ios::binary | ios::app);
     leer2.open(nombre.c_str(), ios::binary | ios::in | ios::out);
-    
     if (leer2.is_open())
     {
         cout<< "Digite porfavor el nombre de su usuario para cargar su factura en su cuenta: "<<endl;
@@ -725,7 +730,6 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
             if (comprobado=1)
             {
                 cout<< "se encontro su usurario"<<endl;
-            
                 if(Leer.is_open())
                 {
                     Leer.read((char *)&produc,sizeof(produc));
@@ -889,7 +893,6 @@ void Cancelar_una_compra (productos produc, string inventario, string recibos, F
                         busca.seekp(ayuda-(sizeof(temporal1.estado_de_compra)));
                         temporal1.estado_de_compra=change;
                         busca.write((char *)&temporal1.estado_de_compra,sizeof(temporal1.estado_de_compra));
-                        
                         busca1.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
                         if(busca1.is_open()) //verificación de apertura de archivo
                         {
@@ -976,7 +979,6 @@ void Total_de_ventas()
 }
 void Producto_mas_vendido(recibo compras[])
 {
-    //REVISIÓN PORQUE DEBE SER VERIFICADO CON EL ARCHIVO DE INVENTARIO
     int contador[100]= {0};
     int mayor=0, aux=0;
     for(int i=0;i<ML;i++)

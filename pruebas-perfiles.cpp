@@ -95,7 +95,7 @@ int main()
                     cout<<"Contraseña: "<<lectura[i].contrasena<<endl;
                     cout<<"Tipo: "<<lectura[i].tipo<<endl;
                     cout<<"Cuenta: "<<lectura[i].cuenta<<endl;
-                    cout<<"Creación: "<<lectura[i].fecha<<endl;
+                    cout<<"Creación: "<<lectura[i].fecha<<"-"<<endl;
                     cout<<endl;
                 }
             }
