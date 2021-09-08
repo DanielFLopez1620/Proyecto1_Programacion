@@ -53,7 +53,7 @@ string convertToString(char* arreglo, int size);  // función de manejo de caden
 productos buscar(string archivo, productos produc);  // buscar un producto en archivo de inventario
 int buscarcodigo(productos produc,string inventario);  // buscar un producto en archivo mediante su código
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);  // función para el cambio de permisos de usuarios
-void Realizar_una_compra(productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion, string nombre, personal enlista [], string necesario);
+void Realizar_una_compra(productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion, string necesario);
 void Cancelar_una_compra(productos produc, string inventario, string recibos, Factura Factu, long direccion);
 void Valor_total_de_compra(string recibos, Factura Factu);
 void Cantidad_de_productos (string recibos, Factura Factu);
@@ -250,7 +250,7 @@ int main()
                                                 necesario=convertToString(registro.nombre,ML);
                                                 cout<<" Hola querido "<<convertToString(registro.nombre,ML)<<endl;
                                                 cout<< "A continuacion se le mostrara todos los productos en los que podra realizar su compra: "<<endl;
-                                                Realizar_una_compra (produc, inventario, compras, recibos,Factu,direccion, nombre, enlista,necesario );         
+                                                Realizar_una_compra (produc, inventario, compras, recibos, Factu, direccion, necesario);         
                                                 break;
                                             case 2:
                                                 cout<<"Eligio la opción de cancelar compra..."<<endl;
@@ -318,7 +318,7 @@ int main()
                         else if(acambiar) // else para cambio de rol de usuario
                         {
                             cout<<"El admin a pedido cambio de rol de su cuenta, seleccione un nuevo rol: "<<endl;
-                            usuarios.open(nombre, ios::binary | ios::in | ios::out);
+                            usuarios.open(nombre, ios::binary | ios::in | ios::out); 
                             if(usuarios.is_open())
                             {
                                 encontrado = false;
@@ -356,23 +356,25 @@ int main()
                                 encontrado = false;
                                 while(!usuarios.eof())
                                 {
-                                    //usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
-                                    usuarios.read(registro.nombre,sizeof(registro.nombre));
+                                    usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
+                                    /*usuarios.read(registro.nombre,sizeof(registro.nombre));
                                     usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
                                     usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
                                     usuarios.read((char *)&registro.cuenta,sizeof(registro.cuenta));
-                                    usuarios.read(registro.fecha,sizeof(registro.fecha));
+                                    usuarios.read(registro.fecha,sizeof(registro.fecha));*/
                                     strcpy(buscado,aux.c_str());  // conversión de apoyo
                                     aux = convertToString(buscado,ML);  // paso a string para mejor comparación
-                                    if(user == aux)  // buscar nuevamente la concidencia
+                                    if(user==aux)  // buscar nuevamente la concidencia
                                     {
                                         encontrado=true;
-                                        direccion = usuarios.tellg();  //asignar la dirección actual en registros
+                                        //direccion = usuarios.tellg();  //asignar la dirección actual en registros
                                         letra = 'b'; // cambio de letra para bloqueo de usuarios
-                                        usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
+                                        //usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
+                                        usuarios.seekp(ios::cur-(sizeof(registro.fecha)+sizeof(registro.cuenta)));
                                         registro.cuenta = letra; 
                                         usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
                                         break;
+                                        //TODO: Tarea pendiente--> Arreglar bloqueo
                                     }
                                 }
                             }
@@ -394,8 +396,8 @@ int main()
                 }
                 else
                     cout<<"Volviendo al menú...nHa ocurrido un error con el archivo de registrados..."<<endl;
-                if(usuarios.is_open())
-                    usuarios.close();
+                //if(usuarios.is_open())
+                //    usuarios.close();
                 break;
             case 2:
                 cout<<"Preparandose para crear un nuevo usuario..."<<endl;
@@ -694,10 +696,10 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     } while (elec!=3 && elec!=4);  // hacer mientras no se indique lo contrario
     return;
 }
-void Realizar_una_compra (productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion, string nombre, personal enlista [], string necesario)
+void Realizar_una_compra (productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion, string necesario)
 {
     long ayuda, actual;
-    char respuesta;
+    char respuesta, respuesta2;
     bool encontrado=false;
     string auxiliar;
     char apoyo [ML]={' '};
@@ -705,31 +707,17 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
     ofstream guardar;
     productos temporal;
     ifstream Leer;
-    ifstream leer2;
     fstream busca;
     Leer.open(inventario.c_str(), ios::binary | ios::app);
-    leer2.open(nombre.c_str(), ios::binary | ios::in | ios::out);
-    if (leer2.is_open())
-    {
         cout<< "Digite porfavor el nombre de su usuario para cargar su factura en su cuenta: "<<endl;
         cin>> auxiliar;
         cout<< "Primero se verificara que el usuario exista"<<endl;
         strcpy(apoyo, auxiliar.c_str());
         auxiliar=convertToString(apoyo,ML);
-        while (!leer2.eof())
+        if(necesario==auxiliar)  // comparación y validación para cambio
         {
-            for(int i=0;i<ML;i++)
-            {
-                leer2.read((char *)&enlista[i],sizeof(enlista[i]));  // lectura comprimida mediante la estructura en lista
-                    if(necesario==auxiliar)  // comparación y validación para cambio
-                    {
-                        cout<<"Encontrado"<<endl;
-                        comprobado=1;
-                    }
-            }
-            if (comprobado=1)
-            {
-                cout<< "se encontro su usurario"<<endl;
+            cout<<"Encontrado"<<endl;
+            cout<< "se encontro su usurario"<<endl;
                 if(Leer.is_open())
                 {
                     Leer.read((char *)&produc,sizeof(produc));
@@ -755,53 +743,33 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                         }
                         if(respuesta=='s')
                         {
-                            confirmar=produc.codigo;
-                            if (contaux<5)
-                            {
-                                guardar.open(recibos, ios :: binary);
-                                if(guardar.fail())
-                                    cout<< "No se puede abrir el archivo";
-                                cout<< "Porfavor ingrese el numero de productos que desea obtener: "<<endl;
-                                cin>> aux;
-                                while (aux>produc.disponibilidad || aux<1)
+                            do
+                            {                           
+                                confirmar=produc.codigo;
+                                if (contaux<5)
                                 {
-                                    cout<<" Esto no es posible debido a que no se puede o no hay tantos de este producto "<<endl;
-                                    cout<<" Porfavor vuelva a ingrese el numero de productos que desea: "<<endl;
-                                    cin>> aux;
-                                }
-                                strcpy(Factu.escogidos[contaux].nombre,produc.nombre);
-                                cambiar=produc.disponibilidad-aux;
-                                produc.disponibilidad=cambiar;
-                                Factu.escogidos[contaux].precio_ind=produc.precio;
-                                Factu.escogidos[contaux].cantidad_compra+=aux;
-                                total=aux*produc.precio;
-                                total+=total;
-                                busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
-                                if(busca.is_open()) //verificación de apertura de archivo
-                                {
-                                    encontrado=false;
-                                    while(!busca.eof())  // mientras el archivo no termine
-                                    {
-                                        busca.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
-                                        direccion = busca.tellg(); // guardado de posición para cambio
-                                        if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                                    guardar.open(recibos, ios :: binary);
+                                    if(guardar.fail())
+                                        cout<< "No se puede abrir el archivo";
+                                        cout<< "Porfavor ingrese el numero de productos que desea obtener: "<<endl;
+                                        cin>> aux;
+                                        while (aux>produc.disponibilidad || aux<1)
                                         {
-                                            cout<<"Encontrado"<<endl;
-                                            encontrado=true;
-                                            ayuda=busca.tellg();
-                                            busca.seekp(ayuda-(sizeof(temporal.disponibilidad)-(sizeof(temporal.ventas)-(sizeof(temporal.codigo)))));
-                                            temporal.disponibilidad=cambiar;
+                                            cout<<" Esto no es posible debido a que no se puede o no hay tantos de este producto "<<endl;
+                                            cout<<" Porfavor vuelva a ingrese el numero de productos que desea: "<<endl;
+                                            cin>> aux;
                                         }
-                                        busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
-                                    }
-                                }
-                                else
-                                cout<<"Ha ocurrido un problema con el archivo"<<endl;
-                                busca.close();
-                                busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
-                                if(busca.is_open()) //verificación de apertura de archivo
-                                {
-                                    encontrado=false;
+                                    strcpy(Factu.escogidos[contaux].nombre,produc.nombre);
+                                    cambiar=produc.disponibilidad-aux;
+                                    produc.disponibilidad=cambiar;
+                                    Factu.escogidos[contaux].precio_ind=produc.precio;
+                                    Factu.escogidos[contaux].cantidad_compra+=aux;
+                                    total=aux*produc.precio;
+                                    total+=total;
+                                    busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
+                                    if(busca.is_open()) //verificación de apertura de archivo
+                                    {
+                                        encontrado=false;
                                         while(!busca.eof())  // mientras el archivo no termine
                                         {
                                             busca.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
@@ -811,17 +779,42 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                                                 cout<<"Encontrado"<<endl;
                                                 encontrado=true;
                                                 ayuda=busca.tellg();
-                                                busca.seekp(ayuda-(sizeof(temporal.ventas)-(sizeof(temporal.codigo))));
-                                                temporal.ventas=temporal.ventas+1;
+                                                busca.seekp(ayuda-(sizeof(temporal.disponibilidad)-(sizeof(temporal.ventas)-(sizeof(temporal.codigo)))));
+                                                temporal.disponibilidad=cambiar;
+                                            }
+                                            busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
                                         }
-                                        busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
                                     }
-                                }
-                                else
+                                    else
                                     cout<<"Ha ocurrido un problema con el archivo"<<endl;
-                                busca.close();
-                                contaux++;
-                            }
+                                    busca.close();
+                                    busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
+                                        if(busca.is_open()) //verificación de apertura de archivo
+                                        {
+                                            encontrado=false;
+                                            while(!busca.eof())  // mientras el archivo no termine
+                                            {
+                                                busca.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
+                                                direccion = busca.tellg(); // guardado de posición para cambio
+                                                if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                                                {
+                                                    cout<<"Encontrado"<<endl;
+                                                    encontrado=true;
+                                                    ayuda=busca.tellg();
+                                                    busca.seekp(ayuda-(sizeof(temporal.ventas)-(sizeof(temporal.codigo))));
+                                                    temporal.ventas=temporal.ventas+1;
+                                                }
+                                            }
+                                            busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
+                                        }
+                                        else
+                                        cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                                        busca.close();
+                                        contaux++;
+                                }
+                                cout<< "Te gustaria comprar otro articulo (s/n)"<<endl;
+                                cin>>respuesta2;
+                            } while (respuesta2=='s'&&contaux<=5);
                             if(contaux>=5)
                             {
                                 cout <<" Ya alcanzo los 5 productos "<<endl;
@@ -839,11 +832,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                 }
             }
             else
-                cout<< "No se encontro su nombre, porfavor verifique he intente mas tarde "<<endl;
-        }
-    }
-    else
-        cout<<"Ha ocurrido un problema con la lectura del archivo..."<<endl;
+            cout<< "No se encontro su nombre, porfavor verifique he intente mas tarde "<<endl;
     Leer.close();
     return;
 }
@@ -859,69 +848,75 @@ void Cancelar_una_compra (productos produc, string inventario, string recibos, F
     int aux=0, confirmar;
     char respues;
     Leer.open(recibos.c_str(), ios::binary | ios::in);
-    if(Leer.is_open())
-    {
-        Leer.read((char *)&Factu,sizeof(Factu));
-        cout<< "Mira los respectivos productos comprados: "<<endl;
-        while(!Leer.eof())//Revisamos el archivo hasta el final
-        {
-            for(int i=0;i<5;i++){
-            cout<<"----------------------------"<<endl;
-            cout<<"Producto:        "<<i+1<<"  "<<Factu.escogidos[i].nombre <<endl;
-            cout<<"Precio:                 "<<Factu.escogidos[i].precio_ind<<endl;
-            cout<<"Cantidad de producto:   "<<Factu.escogidos[i].cantidad_compra <<endl;
-            cout<<"----------------------------"<<endl;
-            cout<<endl;
-            }
-            cout<< "El precio total es de: "<<Factu.precio_total;
-            cout<< "El numero de factura es de: "<<Factu.num_factu;
-            cout<< "Desea cancelar esta factura (s/n)"<<endl;
-            cin>>respues;
-            do
+    
+        /*if()
+        {  
+            if(Leer.is_open())
             {
-                cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
-                cin>>respues;
-            }while (respues!='s' && respues!='n');
-            if(respues== 's')
-            {
-                busca.open(recibos,ios::binary | ios::out | ios::in);
-                if(busca.is_open()) //verificación de apertura de archivo
-                    {              
-                        busca.read((char *)&Factu,sizeof(Factu));  // lectura comprimida mediante la estructura en lista
-                        direccion = busca.tellg(); // guardado de posición para cambio
-                        ayuda=busca.tellg();
-                        busca.seekp(ayuda-(sizeof(temporal1.estado_de_compra)));
-                        temporal1.estado_de_compra=change;
-                        busca.write((char *)&temporal1.estado_de_compra,sizeof(temporal1.estado_de_compra));
-                        busca1.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
-                        if(busca1.is_open()) //verificación de apertura de archivo
-                        {
-                            encontrado=false;
-                            while(!busca1.eof())  // mientras el archivo no termine
-                            {
-                                busca1.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
-                                direccion = busca.tellg(); // guardado de posición para cambio
-                                if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
-                                {
-                                    cout<<"Encontrado"<<endl;
-                                    encontrado=true;
-                                    ayuda=busca.tellg();
-                                    busca.seekp(ayuda-(sizeof(temporal.ventas)-(sizeof(temporal.codigo))));
-                                    temporal.ventas=temporal.ventas-1;
-                                }
-                                  busca1.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
-                            }
-                        }
-                        else
-                        cout<<"Ha ocurrido un problema con el archivo"<<endl;
-                        busca1.close();
+                Leer.read((char *)&Factu,sizeof(Factu));
+                cout<< "Mira los respectivos productos comprados: "<<endl;
+                while(!Leer.eof())//Revisamos el archivo hasta el final
+                {
+                    for(int i=0;i<5;i++){
+                    cout<<"----------------------------"<<endl;
+                    cout<<"Producto:        "<<i+1<<"  "<<Factu.escogidos[i].nombre <<endl;
+                    cout<<"Precio:                 "<<Factu.escogidos[i].precio_ind<<endl;
+                    cout<<"Cantidad de producto:   "<<Factu.escogidos[i].cantidad_compra <<endl;
+                    cout<<"----------------------------"<<endl;
+                    cout<<endl;
                     }
-                    else
-                        cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                    cout<< "El precio total es de: "<<Factu.precio_total;
+                    cout<< "El numero de factura es de: "<<Factu.num_factu;
+                    cout<< "Desea cancelar esta factura (s/n)"<<endl;
+                    cin>>respues;
+                    do
+                    {
+                        cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                        cin>>respues;
+                    }while (respues!='s' && respues!='n');
+                    if(respues== 's')
+                    {
+                        busca.open(recibos,ios::binary | ios::out | ios::in);
+                        if(busca.is_open()) //verificación de apertura de archivo
+                            {              
+                                busca.read((char *)&Factu,sizeof(Factu));  // lectura comprimida mediante la estructura en lista
+                                direccion = busca.tellg(); // guardado de posición para cambio
+                                ayuda=busca.tellg();
+                                busca.seekp(ayuda-(sizeof(temporal1.estado_de_compra)));
+                                temporal1.estado_de_compra=change;
+                                busca.write((char *)&temporal1.estado_de_compra,sizeof(temporal1.estado_de_compra));
+                                busca1.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
+                                if(busca1.is_open()) //verificación de apertura de archivo
+                                {
+                                    encontrado=false;
+                                    while(!busca1.eof())  // mientras el archivo no termine
+                                    {
+                                        busca1.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
+                                        direccion = busca.tellg(); // guardado de posición para cambio
+                                        if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                                        {
+                                            cout<<"Encontrado"<<endl;
+                                            encontrado=true;
+                                            ayuda=busca.tellg();
+                                            busca.seekp(ayuda-(sizeof(temporal.ventas)-(sizeof(temporal.codigo))));
+                                            temporal.ventas=temporal.ventas-1;
+                                        }
+                                        busca1.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
+                                    }
+                                }
+                                else
+                                cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                                busca1.close();
+                            }
+                            else
+                                cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                    }
+                }
             }
+            busca.close();
         }
-    }
-    busca.close();
+        */
+
 return;
 }
 void Valor_total_de_compra(string recibos, Factura Factu)
