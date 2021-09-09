@@ -996,7 +996,7 @@ void Cantidad_de_productos (string recibos, Factura Factu)
     int cont=0;
     char apoyo [ML]={' '};
     bool aux;
-    string auxiliar, seleccion;
+    string auxiliar, seleccion;//Auxiliar
     Leer.open(recibos.c_str(), ios::binary | ios::in);
     if(Leer.is_open())
     {
