@@ -814,6 +814,11 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                                 }
                                 cout<< "Te gustaria comprar otro articulo (s/n)"<<endl;
                                 cin>>respuesta2;
+                                while (respuesta2!='s' && respuesta2!='n')
+                                {
+                                     cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                                     cin>>respuesta2;
+                                }
                             } while (respuesta2=='s'&&contaux<=5);
                             if(contaux>=5)
                             {
@@ -830,6 +835,7 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                     strcpy(Factu.nombre,auxiliar.c_str());
                     guardar.write((char *)&Factu,sizeof(Factu));
                 }
+                guardar.close();
             }
             else
             cout<< "No se encontro su nombre, porfavor verifique he intente mas tarde "<<endl;
@@ -841,138 +847,193 @@ void Cancelar_una_compra (productos produc, string inventario, string recibos, F
     long ayuda;
     bool change=false;
     bool encontrado;
+    char apoyo [ML]={' '};
+    string auxiliar, seleccion;
     productos temporal;
     ifstream Leer;
     fstream busca, busca1;
     Factura temporal1;
-    int aux=0, confirmar;
-    char respues;
+    int confirmar, con;
+    char respues, respuesta2;
     Leer.open(recibos.c_str(), ios::binary | ios::in);
     
-        /*if()
-        {  
-            if(Leer.is_open())
-            {
-                Leer.read((char *)&Factu,sizeof(Factu));
-                cout<< "Mira los respectivos productos comprados: "<<endl;
+    if(Leer.is_open())
+        {
+            Leer.read((char *)&Factu,sizeof(Factu));
+            cout<< "Digite porfavor el nombre de su usuario para cargar su factura en su cuenta: "<<endl;
+            cin>> auxiliar;
+            cout<< "Primero se verificara que el usuario exista"<<endl;
+            strcpy(apoyo, auxiliar.c_str());
+            auxiliar=convertToString(apoyo,ML);
                 while(!Leer.eof())//Revisamos el archivo hasta el final
                 {
-                    for(int i=0;i<5;i++){
-                    cout<<"----------------------------"<<endl;
-                    cout<<"Producto:        "<<i+1<<"  "<<Factu.escogidos[i].nombre <<endl;
-                    cout<<"Precio:                 "<<Factu.escogidos[i].precio_ind<<endl;
-                    cout<<"Cantidad de producto:   "<<Factu.escogidos[i].cantidad_compra <<endl;
-                    cout<<"----------------------------"<<endl;
-                    cout<<endl;
-                    }
-                    cout<< "El precio total es de: "<<Factu.precio_total;
-                    cout<< "El numero de factura es de: "<<Factu.num_factu;
-                    cout<< "Desea cancelar esta factura (s/n)"<<endl;
-                    cin>>respues;
-                    do
+                    seleccion=convertToString(Factu.nombre,ML);
+                    if(seleccion==auxiliar)
                     {
-                        cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
-                        cin>>respues;
-                    }while (respues!='s' && respues!='n');
-                    if(respues== 's')
-                    {
-                        busca.open(recibos,ios::binary | ios::out | ios::in);
-                        if(busca.is_open()) //verificación de apertura de archivo
-                            {              
-                                busca.read((char *)&Factu,sizeof(Factu));  // lectura comprimida mediante la estructura en lista
-                                direccion = busca.tellg(); // guardado de posición para cambio
-                                ayuda=busca.tellg();
-                                busca.seekp(ayuda-(sizeof(temporal1.estado_de_compra)));
-                                temporal1.estado_de_compra=change;
-                                busca.write((char *)&temporal1.estado_de_compra,sizeof(temporal1.estado_de_compra));
-                                busca1.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
-                                if(busca1.is_open()) //verificación de apertura de archivo
-                                {
-                                    encontrado=false;
-                                    while(!busca1.eof())  // mientras el archivo no termine
-                                    {
-                                        busca1.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
-                                        direccion = busca.tellg(); // guardado de posición para cambio
-                                        if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
-                                        {
-                                            cout<<"Encontrado"<<endl;
-                                            encontrado=true;
-                                            ayuda=busca.tellg();
-                                            busca.seekp(ayuda-(sizeof(temporal.ventas)-(sizeof(temporal.codigo))));
-                                            temporal.ventas=temporal.ventas-1;
-                                        }
-                                        busca1.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
-                                    }
-                                }
-                                else
-                                cout<<"Ha ocurrido un problema con el archivo"<<endl;
-                                busca1.close();
+                        do
+                        {                      
+                            cout<< "Mira los respectivos productos comprados: "<<endl;
+                            for(int i=0;i<5;i++){
+                            cout<<"----------------------------"<<endl;
+                            cout<<"Producto:        "<<i+1<<"  "<<Factu.escogidos[i].nombre <<endl;
+                            cout<<"Precio:                 "<<Factu.escogidos[i].precio_ind<<endl;
+                            cout<<"Cantidad de producto:   "<<Factu.escogidos[i].cantidad_compra <<endl;
+                            cout<<"----------------------------"<<endl;
+                            cout<<endl;
                             }
-                            else
-                                cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                            cout<< "El precio total es de: "<<Factu.precio_total;
+                            cout<< "El numero de factura es de: "<<Factu.num_factu;
+                            cout<< "Desea cancelar esta factura (s/n)"<<endl;
+                            cin>>respues;
+                            do
+                            {
+                                cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                                cin>>respues;
+                            }while (respues!='s' && respues!='n');
+                            if(respues== 's')
+                            {
+                                busca.open(recibos,ios::binary | ios::out | ios::in);
+                                if(busca.is_open()) //verificación de apertura de archivo
+                                    {              
+                                        busca.read((char *)&Factu,sizeof(Factu));  // lectura comprimida mediante la estructura en lista
+                                        direccion = busca.tellg(); // guardado de posición para cambio
+                                        ayuda=busca.tellg();
+                                        busca.seekp(ayuda-(sizeof(temporal1.estado_de_compra)));
+                                        temporal1.estado_de_compra=change;
+                                        busca.write((char *)&temporal1.estado_de_compra,sizeof(temporal1.estado_de_compra));
+                                        busca1.open(inventario, ios::binary | ios::out | ios::in );
+                                          // abrir el archivo en los tres modos
+                                        if(busca1.is_open()) //verificación de apertura de archivo
+                                        {
+                                            encontrado=false;
+                                            while(!busca1.eof())  // mientras el archivo no termine
+                                            {
+                                                busca1.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
+                                                direccion = busca.tellg(); // guardado de posición para cambio
+                                                if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                                                {
+                                                    cout<<"Encontrado"<<endl;
+                                                    encontrado=true;
+                                                    ayuda=busca.tellg();
+                                                    busca.seekp(ayuda-(sizeof(temporal.ventas)-(sizeof(temporal.codigo))));
+                                                    temporal.ventas=temporal.ventas-1;
+                                                }
+                                                busca1.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
+                                            }
+                                        }
+                                        else
+                                        cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                                        busca1.close();
+                                    }
+                                    else
+                                        cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                                        busca.close();
+                            }
+                            cout<< "Te gustaria comprar otro articulo (s/n)"<<endl;
+                            cin>>respuesta2;
+                            while (respuesta2!='s' && respuesta2!='n')
+                                {
+                                     cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                                     cin>>respuesta2;
+                                }
+                        }while(respuesta2=='s');
+                        
                     }
+                    
                 }
-            }
-            busca.close();
         }
-        */
-
-return;
+        Leer.close();
+        
+  return;
 }
 void Valor_total_de_compra(string recibos, Factura Factu)
 {
     ifstream Leer;
+    bool aux;
+    char apoyo [ML]={' '};
+    string auxiliar, seleccion;
     Leer.open(recibos.c_str(), ios::binary | ios::in);
+
     if(Leer.is_open())
     {
         Leer.read((char *)&Factu,sizeof(Factu));
-        cout<< "Mira los respectivos productos comprados: "<<endl;
+        cout<< "Digite porfavor el nombre de su usuario para cargar su factura en su cuenta: "<<endl;
+        cin>> auxiliar;
+        cout<< "Primero se verificara que el usuario tenga alguna compra"<<endl;
+        strcpy(apoyo, auxiliar.c_str());
+        auxiliar=convertToString(apoyo,ML);
         while(!Leer.eof())//Revisamos el archivo hasta el final
         {
-            for(int i=0;i<5;i++){
-            cout<<"----------------------------"<<endl;
-            cout<<"Producto:        "<<i<<"  "<<Factu.escogidos[i].nombre <<endl;
-            cout<<"Precio:                 "<<Factu.escogidos[i].precio_ind<<endl;
-            cout<<"Cantidad de producto:   "<<Factu.escogidos[i].cantidad_compra <<endl;
-            cout<<"----------------------------"<<endl;
-            cout<<endl;
+            seleccion=convertToString(Factu.nombre,ML);
+            aux=Factu.estado_de_orden;
+            if (seleccion==auxiliar&& aux==true)
+            {
+                cout<< "Mira el total de la compra con sus respectivos productos seleccionados: "<<endl;
+                for(int i=0;i<5;i++){
+                cout<<"----------------------------"<<endl;
+                cout<<"Producto:        "<<i<<"  "<<Factu.escogidos[i].nombre <<endl;
+                cout<<"Precio:                 "<<Factu.escogidos[i].precio_ind<<endl;
+                cout<<"Cantidad de producto:   "<<Factu.escogidos[i].cantidad_compra <<endl;
+                cout<<"----------------------------"<<endl;
+                cout<<endl;
+                }
+                cout<< "El precio total es de: "<<Factu.precio_total;
+                cout<< "El numero de factura es de: "<<Factu.num_factu;
             }
-            cout<< "El precio total es de: "<<Factu.precio_total;
-            cout<< "El numero de factura es de: "<<Factu.num_factu;
+            else
+            {
+            cout<< "Si no se mostrado ninguna factura es porque: "<<endl;
+            cout<< "No hay ninguna factura a su nombre hasta el momento o estan canceladas sus facturas "<<endl;
+            }
         }
     }
-return;
+    Leer.close();
+ return;
 }
 void Cantidad_de_productos (string recibos, Factura Factu)
 {
     ifstream Leer;
     int cont=0;
+    char apoyo [ML]={' '};
+    bool aux;
+    string auxiliar, seleccion;
     Leer.open(recibos.c_str(), ios::binary | ios::in);
     if(Leer.is_open())
     {
         Leer.read((char *)&Factu,sizeof(Factu));
-        cout<< "Mira los respectivos productos comprados: "<<endl;
+        cout<< "Digite porfavor el nombre de su usuario para cargar su factura en su cuenta: "<<endl;
+        cin>> auxiliar;
+        cout<< "Primero se verificara que el usuario tenga alguna compra"<<endl;
+        strcpy(apoyo, auxiliar.c_str());
+        auxiliar=convertToString(apoyo,ML);
         while(!Leer.eof())//Revisamos el archivo hasta el final
         {
-            for(int i=0;i<5;i++){
-            cout<<"----------------------------"<<endl;
-            cout<<"Producto:        "<<i<<"  "<<Factu.escogidos[i].nombre <<endl;
-            cout<<"Precio:                  "<<Factu.escogidos[i].precio_ind<<endl;
-            cout<<"Cantidad de producto:    "<<Factu.escogidos[i].cantidad_compra <<endl;
-            cout<<"----------------------------"<<endl;
-            cout<<endl;
+            seleccion=convertToString(Factu.nombre,ML);
+            aux=Factu.estado_de_orden;
+            if(seleccion==auxiliar&& aux==true)
+            {
+                cout<< "Mira tus productos que estan en facturas validas y a tu nombre: "<<endl;
+                for(int i=0;i<5;i++)
+                {
+                cout<<"----------------------------"<<endl;
+                cout<<"Producto:        "<<i<<"  "<<Factu.escogidos[i].nombre <<endl;
+                cout<<"Precio:                  "<<Factu.escogidos[i].precio_ind<<endl;
+                cout<<"Cantidad de producto:    "<<Factu.escogidos[i].cantidad_compra <<endl;
+                cout<<"----------------------------"<<endl;
+                cout<<endl;
+                }
             }
-            cout<< "El precio total es de: "<<Factu.precio_total<<endl;
-            cout<< "El numero de factura es de: "<<Factu.num_factu<<endl;
         }
     }
+    Leer.close();
     return;
 }
-void Total_de_ventas()
+void Total_de_ventas()//Terminar mañana
 {
+
     return;
 }
-void Producto_mas_vendido(recibo compras[])
+void Producto_mas_vendido(recibo compras[])//Arreglar
 {
     int contador[100]= {0};
     int mayor=0, aux=0;
