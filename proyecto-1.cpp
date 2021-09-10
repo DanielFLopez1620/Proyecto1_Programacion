@@ -356,21 +356,21 @@ int main()
                                 encontrado = false;
                                 while(!usuarios.eof())
                                 {
-                                    usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
-                                    /*usuarios.read(registro.nombre,sizeof(registro.nombre));
+                                    //usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
+                                    usuarios.read(registro.nombre,sizeof(registro.nombre));
                                     usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
                                     usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
                                     usuarios.read((char *)&registro.cuenta,sizeof(registro.cuenta));
-                                    usuarios.read(registro.fecha,sizeof(registro.fecha));*/
+                                    usuarios.read(registro.fecha,sizeof(registro.fecha));
                                     strcpy(buscado,aux.c_str());  // conversión de apoyo
                                     aux = convertToString(buscado,ML);  // paso a string para mejor comparación
                                     if(user==aux)  // buscar nuevamente la concidencia
                                     {
                                         encontrado=true;
-                                        //direccion = usuarios.tellg();  //asignar la dirección actual en registros
+                                        direccion = usuarios.tellp();  //asignar la dirección actual en registros
                                         letra = 'b'; // cambio de letra para bloqueo de usuarios
-                                        //usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
-                                        usuarios.seekp(ios::cur-(sizeof(registro.fecha)+sizeof(registro.cuenta)));
+                                        usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
+                                        //usuarios.seekp(ios::cur-(sizeof(registro.fecha)+sizeof(registro.cuenta)));
                                         registro.cuenta = letra; 
                                         usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
                                         break;
@@ -623,13 +623,6 @@ string convertToString(char* arreglo, int size) //conversión de string a caract
         s = s + arreglo[i];  // concatenación de char o letras a un string
     return s;
 }
-/*
-void actualizacion_archivo()
-{
-    //--Mejorar y actualizar mediante funciones
-    return;
-}
-*/
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio)
 {
     int elec,con = 0;
@@ -747,130 +740,130 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
         auxiliar=convertToString(apoyo,ML);
         if(necesario==auxiliar)  // comparación y validación para cambio
         {
-            cout<<"Encontrado"<<endl;
+            //cout<<"Encontrado"<<endl;
             cout<< "se encontro su usurario"<<endl;
                 if(Leer.is_open())
                 {
                     Leer.read((char *)&produc,sizeof(produc));
-                    cout<< "Mira los respectivos productos: "<<endl;
-                    cout <<"(Maximo 5 productos)"<<endl;
-                    while(!Leer.eof())//Revisamos el archivo hasta el final
-                    {
-                        aux=0;
-                        cout<<"----------------------------"<<endl;
-                        cout<<"Producto:               "<<produc.nombre <<endl;
-                        cout<<"Categoria:              "<<produc.categoria<<endl;
-                        cout<<"Precio:                 "<<produc.precio <<endl;
-                        cout<<"Disponibilidad:         "<<produc.disponibilidad <<endl;
-                        cout<<"Codigo del producto:    "<<produc.codigo <<endl;
-                        cout<<"----------------------------"<<endl;
-                        cout<<endl;
-                        cout<<"Desea comprar este producto (s/n)"<<endl;
-                        cin>>respuesta;
-                        while (respuesta!='s' && respuesta!='n')
+                        cout<< "Mira los respectivos productos: "<<endl;
+                        while(!Leer.eof())//Revisamos el archivo hasta el final
                         {
-                            cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
-                            cin>>respuesta;
-                        }
-                        if(respuesta=='s')
-                        {
-                            do
-                            {                           
-                                confirmar=produc.codigo;
-                                if (contaux<5)
+                            do{
+                                cout <<"(Maximo 5 productos)"<<endl;
+                                aux=0;
+                                cout<<"----------------------------"<<endl;
+                                cout<<"Producto:               "<<produc.nombre <<endl;
+                                cout<<"Categoria:              "<<produc.categoria<<endl;
+                                cout<<"Precio:                 "<<produc.precio <<endl;
+                                cout<<"Disponibilidad:         "<<produc.disponibilidad <<endl;
+                                cout<<"Codigo del producto:    "<<produc.codigo <<endl;
+                                cout<<"----------------------------"<<endl;
+                                cout<<endl;
+                                cout<<"Desea comprar este producto (s/n)"<<endl;
+                                cin>>respuesta;
+                                while (respuesta!='s' && respuesta!='n')
                                 {
-                                    guardar.open(recibos, ios :: binary);
-                                    if(guardar.fail())
-                                        cout<< "No se puede abrir el archivo";
-                                        cout<< "Porfavor ingrese el numero de productos que desea obtener: "<<endl;
-                                        cin>> aux;
-                                        while (aux>produc.disponibilidad || aux<1)
+                                    cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                                    cin>>respuesta;
+                                }
+                                if(respuesta=='s')
+                                {                        
+                                        confirmar=produc.codigo;
+                                        if (contaux<5)
                                         {
-                                            cout<<" Esto no es posible debido a que no se puede o no hay tantos de este producto "<<endl;
-                                            cout<<" Porfavor vuelva a ingrese el numero de productos que desea: "<<endl;
+                                            guardar.open(recibos, ios :: binary);
+                                            /*if(guardar.fail())
+                                            {
+                                                cout<< "No se puede abrir el archivo"<<endl;
+                                            }*/
+                                            cout<< "Porfavor ingrese el numero de productos que desea obtener: "<<endl;
                                             cin>> aux;
-                                        }
-                                    strcpy(Factu.escogidos[contaux].nombre,produc.nombre);
-                                    cambiar=produc.disponibilidad-aux;
-                                    produc.disponibilidad=cambiar;
-                                    Factu.escogidos[contaux].precio_ind=produc.precio;
-                                    Factu.escogidos[contaux].cantidad_compra+=aux;
-                                    total=aux*produc.precio;
-                                    total+=total;
-                                    busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
-                                    if(busca.is_open()) //verificación de apertura de archivo
-                                    {
-                                        encontrado=false;
-                                        while(!busca.eof())  // mientras el archivo no termine
-                                        {
-                                            busca.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
-                                            direccion = busca.tellg(); // guardado de posición para cambio
-                                            if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                                            while (aux>produc.disponibilidad || aux<1)
                                             {
-                                                cout<<"Encontrado"<<endl;
-                                                encontrado=true;
-                                                ayuda=busca.tellg();
-                                                busca.seekp(ayuda-(sizeof(temporal.disponibilidad)-(sizeof(temporal.ventas)-(sizeof(temporal.codigo)))));
-                                                temporal.disponibilidad=cambiar;
+                                                cout<<" Esto no es posible debido a que no se puede o no hay tantos de este producto "<<endl;
+                                                cout<<" Porfavor vuelva a ingrese el numero de productos que desea: "<<endl;
+                                                cin>> aux;
                                             }
-                                            busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
-                                        }
-                                    }
-                                    else
-                                    cout<<"Ha ocurrido un problema con el archivo"<<endl;
-                                    busca.close();
-                                    busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
-                                        if(busca.is_open()) //verificación de apertura de archivo
-                                        {
-                                            encontrado=false;
-                                            while(!busca.eof())  // mientras el archivo no termine
+                                            strcpy(Factu.escogidos[contaux].nombre,produc.nombre);
+                                            cambiar=produc.disponibilidad-aux;
+                                            produc.disponibilidad=cambiar;
+                                            Factu.escogidos[contaux].precio_ind=produc.precio;
+                                            Factu.escogidos[contaux].cantidad_compra+=aux;
+                                            total=aux*produc.precio;
+                                            total+=total;
+                                            busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
+                                            if(busca.is_open()) //verificación de apertura de archivo
                                             {
-                                                busca.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
-                                                direccion = busca.tellg(); // guardado de posición para cambio
-                                                if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                                                encontrado=false;
+                                                while(!busca.eof())  // mientras el archivo no termine
                                                 {
-                                                    cout<<"Encontrado"<<endl;
-                                                    encontrado=true;
-                                                    ayuda=busca.tellg();
-                                                    busca.seekp(ayuda-(sizeof(temporal.ventas)-(sizeof(temporal.codigo))));
-                                                    temporal.ventas=temporal.ventas+1;
+                                                    busca.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
+                                                    direccion = busca.tellg(); // guardado de posición para cambio
+                                                    if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                                                    {
+                                                        cout<<"Encontrado"<<endl;
+                                                        encontrado=true;
+                                                        ayuda=busca.tellg();
+                                                        busca.seekp(ayuda-(sizeof(temporal.disponibilidad)-(sizeof(temporal.ventas)-(sizeof(temporal.codigo)))));
+                                                        temporal.disponibilidad=cambiar;
+                                                    }
+                                                    busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
                                                 }
                                             }
-                                            busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
+                                            else
+                                            cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                                            busca.close();
+                                            busca.open(inventario, ios::binary | ios::out | ios::in );  // abrir el archivo en los tres modos
+                                                if(busca.is_open()) //verificación de apertura de archivo
+                                                {
+                                                    encontrado=false;
+                                                    while(!busca.eof())  // mientras el archivo no termine
+                                                    {
+                                                        busca.read((char *)&produc,sizeof(produc));  // lectura comprimida mediante la estructura en lista
+                                                        direccion = busca.tellg(); // guardado de posición para cambio
+                                                        if(produc.codigo==confirmar)  // si hay coincidencia de permiso, se va a la siguiente posición
+                                                        {
+                                                            cout<<"Encontrado"<<endl;
+                                                            encontrado=true;
+                                                            ayuda=busca.tellg();
+                                                            busca.seekp(ayuda-(sizeof(temporal.ventas)-(sizeof(temporal.codigo))));
+                                                            temporal.ventas=temporal.ventas+1;
+                                                        }
+                                                    }
+                                                    busca.write((char *)&temporal.disponibilidad,sizeof(temporal.disponibilidad));
+                                                }
+                                                else
+                                                    cout<<"Ha ocurrido un problema con el archivo"<<endl;
+                                                busca.close();
+                                                contaux++;
                                         }
-                                        else
-                                        cout<<"Ha ocurrido un problema con el archivo"<<endl;
-                                        busca.close();
-                                        contaux++;
+                                        cout<< "Te gustaria comprar otro articulo (s/n)"<<endl;
+                                        cin>>respuesta2;
+                                        while (respuesta2!='s' && respuesta2!='n')
+                                        {
+                                            cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                                            cin>>respuesta2;
+                                        }
+                                        
+                                        if(contaux>=5)
+                                        {
+                                            cout <<" Ya alcanzo los 5 productos "<<endl;
+                                            break;
+                                        }
                                 }
-                                cout<< "Te gustaria comprar otro articulo (s/n)"<<endl;
-                                cin>>respuesta2;
-                                while (respuesta2!='s' && respuesta2!='n')
-                                {
-                                     cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
-                                     cin>>respuesta2;
-                                }
-                            } while (respuesta2=='s'&&contaux<=5);
-                            if(contaux>=5)
-                            {
-                                cout <<" Ya alcanzo los 5 productos "<<endl;
-                                break;
-                            }
-                            cout<< "¿Como lo desea pagar?"<<endl;
-                            cout<< ""<<endl;
+                                Leer.read((char *)&produc,sizeof(produc));
+                            }while(respuesta2=='s'||contaux<=5);
                         }
-                        Leer.read((char *)&produc,sizeof(produc));
-                    }
-                    Factu.precio_total = total;
-                    Factu.estado_de_orden=true;
-                    Factu.num_factu=+1;
-                    strcpy(Factu.nombre,auxiliar.c_str());
-                    guardar.write((char *)&Factu,sizeof(Factu));
+                        Factu.precio_total = total;
+                        Factu.estado_de_orden=true;
+                        Factu.num_factu=+1;
+                        strcpy(Factu.nombre,auxiliar.c_str());
+                        guardar.write((char *)&Factu,sizeof(Factu));
                 }
                 guardar.close();
         }
         else
-        cout<< "No se encontro su nombre, porfavor verifique he intente mas tarde "<<endl;
+            cout<< "No se encontro su nombre, porfavor verifique he intente mas tarde "<<endl;
     Leer.close();
     return;
 }
@@ -964,8 +957,8 @@ void Cancelar_una_compra (productos produc, string inventario, string recibos, F
                             cin>>respuesta2;
                             while (respuesta2!='s' && respuesta2!='n')
                                 {
-                                     cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
-                                     cin>>respuesta2;
+                                    cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                                    cin>>respuesta2;
                                 }
                         }while(respuesta2=='s');
                         
@@ -1102,3 +1095,216 @@ void Producto_mas_vendido(recibo compras[])//Arreglar
     cout<<" El producto con mayor ventas " <<mayor<<endl;
     return;
 }
+productos ordenaralf (string archivo, productos produc)
+{
+    productos ejemplo;  //borrar para después
+    int i=0, n=0, p=0, num;
+    string nombre="";
+    fstream tem;
+
+    tem.open(archivo,ios::binary | ios::in);
+    while(!tem.eof())
+    {
+        tem.seekg((i)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+
+        }
+        i=i+1;
+    }
+    num=i-1;
+    cout<<num;
+    tem.close();
+
+    tem.open(archivo,ios::binary | ios::in);
+    productos tempo[num], tep, terr;
+    int codigo[num];
+    while(!tem.eof())
+    {
+        tem.seekg((n)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+
+        tempo[n]=produc;
+        codigo[n]=produc.codigo;
+        tempo[n].codigo=codigo[n];
+        }
+        n=n+1;
+    }
+    tem.close();
+
+
+    for (int j=0; j<num;j++){
+        for (int k=j+1;k<num;k++){
+
+            // strcoll() devuelve -1 si el 1º parametro es mayor que el 2º, 0 si el 1º es igual al 2º, o
+            //1 si el 1º mayor que el 2º. Lo hace caracter a caracter hasta encontrar una diferencia o un nulo que es cuando retorna uno de los valores mensionados.
+            /*if ( ( strcoll(/1º/ tempo[j].nombre, /2º/tempo[k].nombre))>0) 
+            {
+                //esto va subiendo los nombres a la cabeza de la lista
+                strcpy ( tep.nombre, tempo[j].nombre );
+                strcpy ( tempo[j].nombre, tempo[k].nombre );
+                strcpy ( tempo[k].nombre, tep.nombre );
+            }*/
+        }
+    }
+    cout << "los productor ordenados son: "<<endl;
+    for ( int m=0; m<num;m++){
+
+        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
+        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
+    }
+
+
+    tem.close();
+    return ejemplo;
+}
+productos ordenar_precio_M_m (string archivo, productos produc)
+{
+    productos ejemplo;  //borrar para después
+    int i=0, n=0, p=0, num;
+    string nombre="";
+    fstream tem;
+    tem.open(archivo,ios::binary | ios::in);
+    while(!tem.eof())
+    {
+        tem.seekg((i)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+            //¿QUE FALTA...?
+        }
+        i=i+1;
+    }
+    num=i-1;
+    cout<<num;
+    tem.close();
+    tem.open(archivo,ios::binary | ios::in);
+    productos tempo[num], tep, terr;
+    int codigo[num];
+    while(!tem.eof())
+    {
+        tem.seekg((n)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+            tempo[n]=produc;
+            codigo[n]=produc.codigo;
+            tempo[n].codigo=codigo[n];
+        }
+        n=n+1;
+    }
+    tem.close();
+    int aux;
+    for(int j=0; j<num-1; j++)
+    {
+        for(int k=0; k<num-j-1; k++)
+        {
+            if(tempo[k].precio>tempo[k+1].precio)
+            {
+                aux = tempo[k].precio;
+                tempo[k].precio=tempo[k+1].precio;
+                tempo[k+1].precio= aux;
+            }
+        }
+    }
+    cout << "los productor ordenados son: "<<endl;
+    for ( int m=0; m<num;m++){
+
+        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
+        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
+    }
+    tem.close();
+    return ejemplo;
+}
+productos ordenar_precio_m_M (string archivo, productos produc)
+{
+    productos ejemplo;  //borrar para después
+    int i=0, n=0, p=0, num;
+    string nombre="";
+    fstream tem;
+    tem.open(archivo,ios::binary | ios::in);
+    while(!tem.eof())
+    {
+        tem.seekg((i)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+            //¿QUÉ FALTA AQUÍ?
+        }
+        i=i+1;
+    }
+    num=i-1;
+    cout<<num;
+    tem.close();
+
+    tem.open(archivo,ios::binary | ios::in);
+    productos tempo[num], tep, terr;
+    int codigo[num];
+    while(!tem.eof())
+    {
+        tem.seekg((n)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+        tempo[n]=produc;
+        codigo[n]=produc.codigo;
+        tempo[n].codigo=codigo[n];
+        }
+        n=n+1;
+    }
+    tem.close();
+    int aux;
+    for(int j=0; j<num-1; j++)
+    {
+        for(int k=0; k<num-j-1; k++)
+        {
+            if(tempo[k].precio<tempo[k+1].precio)
+            {
+                aux = tempo[k].precio;
+                tempo[k].precio=tempo[k+1].precio;
+                tempo[k+1].precio= aux;
+            }
+
+        }
+    }
+
+    cout << "los productor ordenados son: "<<endl;
+    for ( int m=0; m<num;m++){
+
+        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
+        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
+    }
+    tem.close();
+    return ejemplo;
+}
+/*void menu_categorias();
+{
+    cout<<"Ingrese la categoria del producto: "<<endl;
+    cin>>tempo;
+
+    if(tempo=='L' || tempo=='A' || tempo=='F' || tempo=='D' || tempo=='C' || tempo=='P' || tempo=='B' || tempo=='H' || tempo=='S' || tempo=='W' || tempo=='T')
+    {
+        veri=true;
+        produc.categoria=tempo;
+    }
+    else
+    {
+        veri=false;
+        cout<<"categoria no encontrada, vuelva a escribirla: "<<endl;
+    }
+    }while(veri==false);
+    cout<<"Ingrese el precio: "<<endl;
+    cin>>produc.precio;
+    cout<<"Ingrese la disponibilidad del producto: "<<endl;
+    cin>>produc.disponibilidad;
+    autoincremental=buscarcodigo(produc,inventario);
+    cout<<"El codigo del producto es: ";
+    produc.codigo=autoincremental+1;
+    cout<<produc.codigo<<endl;
+    archivoproducto(inventario,produc);
+
+   tem.close();
+}*/
