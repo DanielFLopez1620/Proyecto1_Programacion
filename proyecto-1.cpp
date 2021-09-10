@@ -57,7 +57,7 @@ void Realizar_una_compra(productos produc, string inventario, recibo compras[], 
 void Cancelar_una_compra(productos produc, string inventario, string recibos, Factura Factu, long direccion);
 void Valor_total_de_compra(string recibos, Factura Factu);
 void Cantidad_de_productos (string recibos, Factura Factu);
-void Total_de_ventas();
+void Total_de_ventas(productos produc, string inventario);
 void Producto_mas_vendido(recibo compras[]);
 //--DESARROLLO DEL MAIN----------------------------------------------------------------------------------------------------------------------
 int main()
@@ -292,7 +292,7 @@ int main()
                                                 break;
                                             case 3:
                                                 cout<<"Calculando el total de ventas del programa..."<<endl;
-                                                Total_de_ventas();
+                                                Total_de_ventas(produc, inventario);
                                                 break;
                                             case 4:
                                                 cout<<"Buscando el producto más vendido..."<<endl;
@@ -520,22 +520,53 @@ void menu_consul()   // menu del consultor
 void crear_producto(productos produc,string inventario)
 {
     int autoincremental=0;
+    char respuesta2;
     fstream tem;
-    tem.open(inventario.c_str(), ios::binary | ios::app);
-    tem.seekg(0,ios::end);
-    cout<<"Ingrese el nombre del producto: "<<endl;
-    cin>>produc.nombre;
-    cout<<"Ingrese la categoria del producto: "<<endl;
-    cin>>produc.categoria;
-    cout<<"Ingrese el precio: "<<endl;
-    cin>>produc.precio;
-    cout<<"Ingrese la disponibilidad del producto: "<<endl;
-    cin>>produc.disponibilidad;
-    autoincremental=buscarcodigo(produc,inventario);
-    cout<<"El codigo del producto es: ";
-    produc.codigo=autoincremental+1;
-    cout<<produc.codigo<<endl;
-    archivoproducto(inventario,produc);
+    char apoyo [ML]={' '};
+    string auxiliar, seleccion;
+    do
+    {
+        tem.open(inventario.c_str(), ios::binary | ios::in);
+            if(tem.is_open())
+            {
+                tem.read((char *)&produc,sizeof(produc));
+                cout<< "Digite el nombre a ingresar nuevo: "<<endl;
+                getline(cin>>ws,auxiliar);
+                cout<< "Se verificara que el producto no exista"<<endl;
+                strcpy(apoyo, auxiliar.c_str());
+                auxiliar=convertToString(apoyo,ML);
+                while (!tem.eof())
+                {
+                    seleccion=convertToString(produc.nombre,ML);
+                    if(auxiliar!=seleccion)
+                    {
+                        tem.seekg(0,ios::end);
+                        strcpy(produc.nombre,auxiliar.c_str());
+                        cout<<"Ingrese la categoria del producto: "<<endl;
+                        cin>>produc.categoria;
+                        cout<<"Ingrese el precio: "<<endl;
+                        cin>>produc.precio;
+                        cout<<"Ingrese la disponibilidad del producto: "<<endl;
+                        cin>>produc.disponibilidad;
+                        autoincremental=buscarcodigo(produc,inventario);
+                        cout<<"El codigo del producto es: ";
+                        produc.codigo=autoincremental+1;
+                        cout<<produc.codigo<<endl;
+                        archivoproducto(inventario,produc);
+                    }
+                    else
+                        cout<< " Por favor este producto ya existe "<<endl;
+                }
+            }
+            cout<<" Te gustaria añadir otro producto (s/n) "<<endl;
+            cin>>respuesta2;
+            while (respuesta2!='s' && respuesta2!='n')
+            {
+                    cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
+                    cin>>respuesta2;
+            }
+    }while (respuesta2=='s');
+    
     tem.close();
     return;
 }
@@ -825,20 +856,21 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                                 cout <<" Ya alcanzo los 5 productos "<<endl;
                                 break;
                             }
+                            cout<< "¿Como lo desea pagar?"<<endl;
+                            cout<< ""<<endl;
                         }
                         Leer.read((char *)&produc,sizeof(produc));
                     }
                     Factu.precio_total = total;
                     Factu.estado_de_orden=true;
                     Factu.num_factu=+1;
-                    getline(cin>>ws,auxiliar);
                     strcpy(Factu.nombre,auxiliar.c_str());
                     guardar.write((char *)&Factu,sizeof(Factu));
                 }
                 guardar.close();
-            }
-            else
-            cout<< "No se encontro su nombre, porfavor verifique he intente mas tarde "<<endl;
+        }
+        else
+        cout<< "No se encontro su nombre, porfavor verifique he intente mas tarde "<<endl;
     Leer.close();
     return;
 }
@@ -856,7 +888,6 @@ void Cancelar_una_compra (productos produc, string inventario, string recibos, F
     int confirmar, con;
     char respues, respuesta2;
     Leer.open(recibos.c_str(), ios::binary | ios::in);
-    
     if(Leer.is_open())
         {
             Leer.read((char *)&Factu,sizeof(Factu));
@@ -1028,9 +1059,28 @@ void Cantidad_de_productos (string recibos, Factura Factu)
     Leer.close();
     return;
 }
-void Total_de_ventas()//Terminar mañana
+void Total_de_ventas(productos produc, string inventario)
 {
-
+    ifstream Leer;
+    Leer.open(inventario.c_str(), ios::binary | ios::app);
+    if(Leer.is_open())
+                {
+                    Leer.read((char *)&produc,sizeof(produc));
+                    cout<< "Mira los respectivos productos: "<<endl;
+                    cout <<"(Maximo 5 productos)"<<endl;
+                    while(!Leer.eof())//Revisamos el archivo hasta el final
+                    {
+                        cout<<"----------------------------"<<endl;
+                        cout<<"     El total de ventas     "<<endl;
+                        cout<<"----------------------------"<<endl;
+                        cout<<"   Es de:           "<<produc.ventas;
+                        cout<<" Aqui estan unicamente las ";
+                        cout<<"ventas vigentes a pagar     "<<endl;
+                        cout<<"----------------------------"<<endl;
+                        cout<<endl;
+                    }
+                }
+                Leer.close();
     return;
 }
 void Producto_mas_vendido(recibo compras[])//Arreglar
