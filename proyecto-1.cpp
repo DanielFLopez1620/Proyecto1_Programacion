@@ -51,6 +51,9 @@ void crear_producto(productos produc,string inventario);  // función para crear
 void archivoproducto (string inventario, productos produc);  // función para...
 string convertToString(char* arreglo, int size);  // función de manejo de cadenas, paso de vecotr char a string
 productos buscar(string archivo, productos produc);  // buscar un producto en archivo de inventario
+productos ordenaralf (string archivo, productos produc);
+productos ordenar_precio_M_m (string archivo, productos produc);
+productos ordenar_precio_m_M (string archivo, productos produc);
 int buscarcodigo(productos produc,string inventario);  // buscar un producto en archivo mediante su código
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);  // función para el cambio de permisos de usuarios
 void Realizar_una_compra(productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion, string necesario);
@@ -65,7 +68,7 @@ void bloqueo(personal registro,string nombre,string aux);
 int main()
 {
     setlocale(LC_ALL,"");  //configuración de región
-    int var,*avar,lec,*alec,con=0;  //punteros y variables de manejo de menu;
+    int var,*avar,lec,*alec,con=0, orden;  //punteros y variables de manejo de menu;
     char opt,letra,cambio;  //auxiliares y apoyos en el manejo del menu;
     bool encontrado,correcta,permitido,borrada,acambiar; // booleanos del programa
     recibo compras[ML];   // estrucutura para recibos
@@ -178,6 +181,7 @@ int main()
                                             case 4:
                                                 cout<<"Abriendo función de administrar productos..."<<endl;
                                                 cout<<"¿Qué desea hacer?\n1)Crear producto\n2)Abastecer producto\nPara salir un numero diferente"<<endl;
+                                                cin>> *alec;
                                                 switch (lec)
                                                 {
                                                     case 1:
@@ -250,7 +254,7 @@ int main()
                                             case 1:
                                                 cout<<"Eligio realizar una compra..."<<endl;
                                                 necesario=convertToString(registro.nombre,ML);
-                                                cout<<" Hola querido "<<convertToString(registro.nombre,ML)<<endl;
+                                                cout<<" Hola querid@ "<<convertToString(registro.nombre,ML)<<endl;
                                                 cout<< "A continuacion se le mostrara todos los productos en los que podra realizar su compra: "<<endl;
                                                 Realizar_una_compra (produc, inventario, compras, recibos, Factu, direccion, necesario);         
                                                 break;
@@ -288,6 +292,30 @@ int main()
                                         {
                                         case 1:
                                                 cout<<"Cargando registros para listar productos..."<<endl;
+                                                do{
+                                                cout<<" por favor ingrese el tipo de ordenamiento que desea hacer "<<endl;
+                                                cout<<" 1) imprimir por orden del codigo "<<endl;
+                                                cout<<" 2) ordenar por orden alfabetico  "<<endl;
+                                                cout<<" 3) ordenar por precio de mayor a menor "<<endl;
+                                                cout<<" 4) ordenar por precio de menor a mayor "<<endl;
+                                                cout<<" 5)salir "<<endl;
+                                                cin>>orden;
+                                                if(orden=1){
+                                                    buscar(inventario,produc);
+                                                }
+                                                if(orden=2){
+                                                    ordenaralf (inventario,produc);
+                                                }
+                                                if(orden=3){
+                                                    ordenar_precio_M_m(inventario,produc);
+                                                }
+                                                if(orden=4){
+                                                    ordenar_precio_m_M(inventario,produc);
+                                                }
+                                                if(orden=5){
+                                                    cout<<"bye bb"<<endl;
+                                                }
+                                                }while(orden!=5);
                                                 break;
                                             case 2:
                                                 cout<<"Cargando regristros de los clientes existentes..."<<endl;
@@ -525,12 +553,34 @@ void menu_consul()   // menu del consultor
     cout<<"*********************************"<<endl;
     return;  //return final
 }
+void menu_categorias(){
+
+    cout<<"*********************************"<<endl;
+    cout<<"*     OPCIONES DE categorias    *"<<endl;
+    cout<<"*********************************"<<endl;
+    cout<<"*      L) Lacteos               *"<<endl;
+    cout<<"*      A) Aceites               *"<<endl;
+    cout<<"*      F) Frutas y Hortalizas   *"<<endl;
+    cout<<"*      D) Confiteria            *"<<endl;
+    cout<<"*      C) Cereales              *"<<endl;
+    cout<<"*      P) Panaderia             *"<<endl;
+    cout<<"*      B) Productos carnico     *"<<endl;
+    cout<<"*      H) Huevos                *"<<endl;
+    cout<<"*      S) Salsas                *"<<endl;
+    cout<<"*      W) Bebidas               *"<<endl;
+    cout<<"*      T) Aperitivos            *"<<endl;
+    cout<<"*********************************"<<endl;
+    return;  //return final
+
+}
 void crear_producto(productos produc,string inventario)
 {
     int autoincremental=0;
     char respuesta2;
     fstream tem;
     char apoyo [ML]={' '};
+    char tempo={' '};
+    bool veri;
     string auxiliar, seleccion;
     do
     {
@@ -550,8 +600,20 @@ void crear_producto(productos produc,string inventario)
                     {
                         tem.seekg(0,ios::end);
                         strcpy(produc.nombre,auxiliar.c_str());
-                        cout<<"Ingrese la categoria del producto: "<<endl;
-                        cin>>produc.categoria;
+                        do{
+                            menu_categorias();
+                            cout<<"Ingrese la categoria del producto: "<<endl;
+                            cin>>tempo;
+
+                            if(tempo=='L' || tempo=='A' || tempo=='F' || tempo=='D' || tempo=='C' || tempo=='P' || tempo=='B' || tempo=='H' || tempo=='S' || tempo=='W' || tempo=='T'){
+                            veri=true;
+                            produc.categoria=tempo;
+                            }
+                            else{
+                            veri=false;
+                            cout<<"categoria no encontrada, vuelva a escribirla: "<<endl;
+                            }
+                            }while(veri==false);
                         cout<<"Ingrese el precio: "<<endl;
                         cin>>produc.precio;
                         cout<<"Ingrese la disponibilidad del producto: "<<endl;
@@ -562,8 +624,7 @@ void crear_producto(productos produc,string inventario)
                         cout<<produc.codigo<<endl;
                         archivoproducto(inventario,produc);
                     }
-                    else
-                        cout<< " Por favor este producto ya existe "<<endl;
+                    tem.read((char *)&produc,sizeof(produc));
                 }
             }
             cout<<" Te gustaria añadir otro producto (s/n) "<<endl;
@@ -574,7 +635,6 @@ void crear_producto(productos produc,string inventario)
                     cin>>respuesta2;
             }
     }while (respuesta2=='s');
-    
     tem.close();
     return;
 }
@@ -623,6 +683,207 @@ int buscarcodigo(productos produc,string inventario)
     autoincremental=produc.codigo;
     tem.close();
     return autoincremental;
+}
+productos ordenaralf (string archivo, productos produc)
+{
+    productos ejemplo;  //borrar para después
+    int i=0, n=0, p=0, num;
+    string nombre="";
+    fstream tem;
+
+    tem.open(archivo,ios::binary | ios::in);
+    while(!tem.eof())
+    {
+        tem.seekg((i)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+
+        }
+        i=i+1;
+    }
+    num=i-1;
+    cout<<num;
+    tem.close();
+
+    tem.open(archivo,ios::binary | ios::in);
+    productos tempo[num], tep, terr;
+    int codigo[num];
+    while(!tem.eof())
+    {
+        tem.seekg((n)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+
+        tempo[n]=produc;
+        codigo[n]=produc.codigo;
+        tempo[n].codigo=codigo[n];
+        }
+        n=n+1;
+    }
+    tem.close();
+
+
+    for (int j=0; j<num;j++){
+        for (int k=j+1;k<num;k++){
+
+            // strcoll() devuelve -1 si el 1º parametro es mayor que el 2º, 0 si el 1º es igual al 2º, o
+            //1 si el 1º mayor que el 2º. Lo hace caracter a caracter hasta encontrar una diferencia o un nulo que es cuando retorna uno de los valores mensionados.
+            if ( ( strcoll(/*1º*/ tempo[j].nombre, /*2º*/tempo[k].nombre))>0) {
+
+                //esto va subiendo los nombres a la cabeza de la lista
+                strcpy ( tep.nombre, tempo[j].nombre );
+                strcpy ( tempo[j].nombre, tempo[k].nombre );
+                strcpy ( tempo[k].nombre, tep.nombre );
+            }
+        }
+    }
+
+     cout << "los productor ordenados son: "<<endl;
+    for ( int m=0; m<num;m++){
+
+        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
+        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
+    }
+
+
+    tem.close();
+    return ejemplo;
+}
+productos ordenar_precio_M_m (string archivo, productos produc)
+{
+    productos ejemplo;  //borrar para después
+    int i=0, n=0, p=0, num;
+    string nombre="";
+    fstream tem;
+
+    tem.open(archivo,ios::binary | ios::in);
+    while(!tem.eof())
+    {
+        tem.seekg((i)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+
+        }
+        i=i+1;
+    }
+    num=i-1;
+    cout<<num;
+    tem.close();
+
+    tem.open(archivo,ios::binary | ios::in);
+    productos tempo[num], tep, terr;
+    int codigo[num];
+      while(!tem.eof())
+    {
+        tem.seekg((n)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+
+        tempo[n]=produc;
+        codigo[n]=produc.codigo;
+        tempo[n].codigo=codigo[n];
+        }
+        n=n+1;
+    }
+    tem.close();
+
+
+   int aux;
+    for(int j=0; j<num-1; j++)
+    {
+        for(int k=0; k<num-j-1; k++)
+        {
+            if(tempo[k].precio>tempo[k+1].precio)
+            {
+                aux = tempo[k].precio;
+                tempo[k].precio=tempo[k+1].precio;
+                tempo[k+1].precio= aux;
+            }
+
+        }
+    }
+
+     cout << "los productor ordenados son: "<<endl;
+    for ( int m=0; m<num;m++){
+
+        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
+        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
+    }
+
+
+    tem.close();
+    return ejemplo;
+}
+productos ordenar_precio_m_M (string archivo, productos produc)
+{
+    productos ejemplo;  //borrar para después
+    int i=0, n=0, p=0, num;
+    string nombre="";
+    fstream tem;
+
+    tem.open(archivo,ios::binary | ios::in);
+    while(!tem.eof())
+    {
+        tem.seekg((i)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+
+        }
+        i=i+1;
+    }
+    num=i-1;
+    cout<<num;
+    tem.close();
+
+    tem.open(archivo,ios::binary | ios::in);
+    productos tempo[num], tep, terr;
+    int codigo[num];
+      while(!tem.eof())
+    {
+        tem.seekg((n)*sizeof(produc));
+        tem.read((char *) &produc,sizeof(produc));
+        if(tem.good())
+        {
+
+        tempo[n]=produc;
+        codigo[n]=produc.codigo;
+        tempo[n].codigo=codigo[n];
+        }
+        n=n+1;
+    }
+    tem.close();
+
+
+   int aux;
+    for(int j=0; j<num-1; j++)
+    {
+        for(int k=0; k<num-j-1; k++)
+        {
+            if(tempo[k].precio<tempo[k+1].precio)
+            {
+                aux = tempo[k].precio;
+                tempo[k].precio=tempo[k+1].precio;
+                tempo[k+1].precio= aux;
+            }
+
+        }
+    }
+
+     cout << "los productor ordenados son: "<<endl;
+    for ( int m=0; m<num;m++){
+
+        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
+        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
+    }
+
+
+    tem.close();
+    return ejemplo;
 }
 string convertToString(char* arreglo, int size) //conversión de string a caracter mediante concatenación
 {
@@ -732,16 +993,16 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
 }
 void Realizar_una_compra (productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion, string necesario)
 {
-    long ayuda, actual;
-    char respuesta, respuesta2;
-    bool encontrado=false;
+    long ayuda, actual;//Auxiliares para saber la posicion 
+    char respuesta, respuesta2;//Auxiliares pra manejo de la funcion
+    bool encontrado=false, aux2=true;//bool para verificar
     string auxiliar;
     char apoyo [ML]={' '};
-    int contaux=0, aux=0,confirmar=0, cambiar=0,total, comprobado=0;
-    ofstream guardar;
-    productos temporal;
-    ifstream Leer;
-    fstream busca;
+    int contaux=0, aux=0,confirmar=0, cambiar=0,total, comprobado=0; //Auxiliares pra manejo de la funcion
+    ofstream guardar; //Variables de archivo para buscar
+    productos temporal; //Variables de estructura de productos para modificar
+    ifstream Leer; //Variables de archivo para leer
+    fstream busca; //Variables de modificacion
     Leer.open(inventario.c_str(), ios::binary | ios::app);
         cout<< "Digite porfavor el nombre de su usuario para cargar su factura en su cuenta: "<<endl;
         cin>> auxiliar;
@@ -854,15 +1115,23 @@ void Realizar_una_compra (productos produc, string inventario, recibo compras[],
                                             cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
                                             cin>>respuesta2;
                                         }
-                                        
-                                        if(contaux>=5)
+                                        if(respuesta2=='n')
+                                        {
+                                            aux2=false;
+                                        }
+                                        else if(respuesta2=='s')
+                                        {
+                                            aux2=true;                                        
+                                        }
+                                        else if(contaux>=5)
                                         {
                                             cout <<" Ya alcanzo los 5 productos "<<endl;
+                                            aux2=false;
                                             break;
                                         }
                                 }
                                 Leer.read((char *)&produc,sizeof(produc));
-                            }while(respuesta2=='s'||contaux<=5);
+                            }while(aux2==true);
                         }
                         Factu.precio_total = total;
                         Factu.estado_de_orden=true;
@@ -1146,216 +1415,6 @@ void Producto_mas_vendido(string recibos, Factura Factu, recibo compras[])//Arre
     
     return;
 }
-productos ordenaralf (string archivo, productos produc)
-{
-    productos ejemplo;  //borrar para después
-    int i=0, n=0, p=0, num;
-    string nombre="";
-    fstream tem;
-
-    tem.open(archivo,ios::binary | ios::in);
-    while(!tem.eof())
-    {
-        tem.seekg((i)*sizeof(produc));
-        tem.read((char *) &produc,sizeof(produc));
-        if(tem.good())
-        {
-
-        }
-        i=i+1;
-    }
-    num=i-1;
-    cout<<num;
-    tem.close();
-
-    tem.open(archivo,ios::binary | ios::in);
-    productos tempo[num], tep, terr;
-    int codigo[num];
-    while(!tem.eof())
-    {
-        tem.seekg((n)*sizeof(produc));
-        tem.read((char *) &produc,sizeof(produc));
-        if(tem.good())
-        {
-
-        tempo[n]=produc;
-        codigo[n]=produc.codigo;
-        tempo[n].codigo=codigo[n];
-        }
-        n=n+1;
-    }
-    tem.close();
-    for (int j=0; j<num;j++)
-    {
-        for (int k=j+1;k<num;k++)
-        {
-            // strcoll() devuelve -1 si el 1º parametro es mayor que el 2º, 0 si el 1º es igual al 2º, o
-            //1 si el 1º mayor que el 2º. Lo hace caracter a caracter hasta encontrar una diferencia o un nulo que es cuando retorna uno de los valores mensionados.
-            /*if ( ( strcoll(/1º/ tempo[j].nombre, /2º/tempo[k].nombre))>0) 
-            {
-                //esto va subiendo los nombres a la cabeza de la lista
-                strcpy ( tep.nombre, tempo[j].nombre );
-                strcpy ( tempo[j].nombre, tempo[k].nombre );
-                strcpy ( tempo[k].nombre, tep.nombre );
-            }*/
-        }
-    }
-    cout << "los productor ordenados son: "<<endl;
-    for ( int m=0; m<num;m++)
-    {
-        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
-        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
-    }
-    tem.close();
-    return ejemplo;
-}
-productos ordenar_precio_M_m (string archivo, productos produc)
-{
-    productos ejemplo;  //borrar para después
-    int i=0, n=0, p=0, num;
-    string nombre="";
-    fstream tem;
-    tem.open(archivo,ios::binary | ios::in);
-    while(!tem.eof())
-    {
-        tem.seekg((i)*sizeof(produc));
-        tem.read((char *) &produc,sizeof(produc));
-        if(tem.good())
-        {
-            //¿QUE FALTA...?
-        }
-        i=i+1;
-    }
-    num=i-1;
-    cout<<num;
-    tem.close();
-    tem.open(archivo,ios::binary | ios::in);
-    productos tempo[num], tep, terr;
-    int codigo[num];
-    while(!tem.eof())
-    {
-        tem.seekg((n)*sizeof(produc));
-        tem.read((char *) &produc,sizeof(produc));
-        if(tem.good())
-        {
-            tempo[n]=produc;
-            codigo[n]=produc.codigo;
-            tempo[n].codigo=codigo[n];
-        }
-        n=n+1;
-    }
-    tem.close();
-    int aux;
-    for(int j=0; j<num-1; j++)
-    {
-        for(int k=0; k<num-j-1; k++)
-        {
-            if(tempo[k].precio>tempo[k+1].precio)
-            {
-                aux = tempo[k].precio;
-                tempo[k].precio=tempo[k+1].precio;
-                tempo[k+1].precio= aux;
-            }
-        }
-    }
-    cout << "los productor ordenados son: "<<endl;
-    for ( int m=0; m<num;m++){
-
-        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
-        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
-    }
-    tem.close();
-    return ejemplo;
-}
-productos ordenar_precio_m_M (string archivo, productos produc)
-{
-    productos ejemplo;  //borrar para después
-    int i=0, n=0, p=0, num;
-    string nombre="";
-    fstream tem;
-    tem.open(archivo,ios::binary | ios::in);
-    while(!tem.eof())
-    {
-        tem.seekg((i)*sizeof(produc));
-        tem.read((char *) &produc,sizeof(produc));
-        if(tem.good())
-        {
-            //¿QUÉ FALTA AQUÍ?
-        }
-        i=i+1;
-    }
-    num=i-1;
-    cout<<num;
-    tem.close();
-
-    tem.open(archivo,ios::binary | ios::in);
-    productos tempo[num], tep, terr;
-    int codigo[num];
-    while(!tem.eof())
-    {
-        tem.seekg((n)*sizeof(produc));
-        tem.read((char *) &produc,sizeof(produc));
-        if(tem.good())
-        {
-        tempo[n]=produc;
-        codigo[n]=produc.codigo;
-        tempo[n].codigo=codigo[n];
-        }
-        n=n+1;
-    }
-    tem.close();
-    int aux;
-    for(int j=0; j<num-1; j++)
-    {
-        for(int k=0; k<num-j-1; k++)
-        {
-            if(tempo[k].precio<tempo[k+1].precio)
-            {
-                aux = tempo[k].precio;
-                tempo[k].precio=tempo[k+1].precio;
-                tempo[k+1].precio= aux;
-            }
-
-        }
-    }
-
-    cout << "los productor ordenados son: "<<endl;
-    for ( int m=0; m<num;m++){
-
-        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
-        cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
-    }
-    tem.close();
-    return ejemplo;
-}
-/*void menu_categorias();
-{
-    cout<<"Ingrese la categoria del producto: "<<endl;
-    cin>>tempo;
-
-    if(tempo=='L' || tempo=='A' || tempo=='F' || tempo=='D' || tempo=='C' || tempo=='P' || tempo=='B' || tempo=='H' || tempo=='S' || tempo=='W' || tempo=='T')
-    {
-        veri=true;
-        produc.categoria=tempo;
-    }
-    else
-    {
-        veri=false;
-        cout<<"categoria no encontrada, vuelva a escribirla: "<<endl;
-    }
-    }while(veri==false);
-    cout<<"Ingrese el precio: "<<endl;
-    cin>>produc.precio;
-    cout<<"Ingrese la disponibilidad del producto: "<<endl;
-    cin>>produc.disponibilidad;
-    autoincremental=buscarcodigo(produc,inventario);
-    cout<<"El codigo del producto es: ";
-    produc.codigo=autoincremental+1;
-    cout<<produc.codigo<<endl;
-    archivoproducto(inventario,produc);
-
-    tem.close();
-}*/
 void lista_clientes(string archivo,int orden)
 {
     fstream canal;
