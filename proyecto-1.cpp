@@ -69,7 +69,7 @@ int main()
 {
     setlocale(LC_ALL,"");  //configuración de región
     int var,*avar,lec,*alec,con=0, orden;  //punteros y variables de manejo de menu;
-    char opt,letra,cambio;  //auxiliares y apoyos en el manejo del menu;
+    char opt,letra,cambio, comp;  //auxiliares y apoyos en el manejo del menu;
     bool encontrado,correcta,permitido,borrada,acambiar; // booleanos del programa
     recibo compras[ML];   // estrucutura para recibos
     personal nuevo,registro,enlista[ML]; //estructura de personal para nuevos usuarios
@@ -186,8 +186,12 @@ int main()
                                                 {
                                                     case 1:
                                                         cout<<"Cargando formato de generación..."<<endl;
+                                                        do{
                                                         crear_producto(produc,inventario);
                                                         buscar(inventario,produc);
+                                                        cout<<"desea ingresar otro producto "<<endl;
+                                                        cin>>comp;
+                                                        }while(comp='s');
                                                         break;
                                                     case 2:
                                                         cout<<"Cargando inventario..."<<endl;
@@ -276,10 +280,10 @@ int main()
                                                 default: 
                                                 cout<<"Volviendo a mostrar el menu"<<endl;
                                                 break;
-                                            menu_client();
-                                            cout<<"Digite su opción, querido cliente: "<<endl;
-                                            cin>> *avar;
                                         }
+                                        menu_client();
+                                        cout<<"Digite su opción, querido cliente: "<<endl;
+                                        cin>> *avar;
                                     } while (var!=5);
                                 break;
                                 case 'o':   //----------------------------------Funcionalidades del consultor-------------------------------
@@ -342,10 +346,10 @@ int main()
                                             default: 
                                                 cout<<"Volviendo a mostrar el menu"<<endl;
                                                 break;
-                                            menu_consul();
-                                            cout<<"Digite su opción, querido cliente: "<<endl;
-                                            cin>> *avar;
                                         }
+                                        menu_consul();
+                                        cout<<"Digite su opción, querido consultor: "<<endl;
+                                        cin>> *avar;
                                     } while (var!=5);
                                 break;
                                 default:
@@ -582,9 +586,8 @@ void crear_producto(productos produc,string inventario)
     char tempo={' '};
     bool veri;
     string auxiliar, seleccion;
-    do
-    {
-        tem.open(inventario.c_str(), ios::binary | ios::in);
+   
+    tem.open(inventario.c_str(), ios::binary | ios::in);
             if(tem.is_open())
             {
                 tem.read((char *)&produc,sizeof(produc));
@@ -593,27 +596,28 @@ void crear_producto(productos produc,string inventario)
                 cout<< "Se verificara que el producto no exista"<<endl;
                 strcpy(apoyo, auxiliar.c_str());
                 auxiliar=convertToString(apoyo,ML);
-                while (!tem.eof())
-                {
+                while (!tem.eof()){}
+                
                     seleccion=convertToString(produc.nombre,ML);
                     if(auxiliar!=seleccion)
                     {
                         tem.seekg(0,ios::end);
                         strcpy(produc.nombre,auxiliar.c_str());
-                        do{
-                            menu_categorias();
-                            cout<<"Ingrese la categoria del producto: "<<endl;
-                            cin>>tempo;
+                        
+                           do{
+                                menu_categorias();
+                                cout<<"Ingrese la categoria del producto: "<<endl;
+                                cin>>tempo;
 
-                            if(tempo=='L' || tempo=='A' || tempo=='F' || tempo=='D' || tempo=='C' || tempo=='P' || tempo=='B' || tempo=='H' || tempo=='S' || tempo=='W' || tempo=='T'){
-                            veri=true;
-                            produc.categoria=tempo;
-                            }
-                            else{
-                            veri=false;
-                            cout<<"categoria no encontrada, vuelva a escribirla: "<<endl;
-                            }
-                            }while(veri==false);
+                                if(tempo=='L' || tempo=='A' || tempo=='F' || tempo=='D' || tempo=='C' || tempo=='P' || tempo=='B' || tempo=='H' || tempo=='S' || tempo=='W' || tempo=='T'){
+                                veri=true;
+                                produc.categoria=tempo;
+                                }
+                                else{
+                                veri=false;
+                                cout<<"categoria no encontrada, vuelva a escribirla: "<<endl;
+                                }
+                                }while(veri==false);
                         cout<<"Ingrese el precio: "<<endl;
                         cin>>produc.precio;
                         cout<<"Ingrese la disponibilidad del producto: "<<endl;
@@ -625,16 +629,8 @@ void crear_producto(productos produc,string inventario)
                         archivoproducto(inventario,produc);
                     }
                     tem.read((char *)&produc,sizeof(produc));
-                }
+                
             }
-            cout<<" Te gustaria añadir otro producto (s/n) "<<endl;
-            cin>>respuesta2;
-            while (respuesta2!='s' && respuesta2!='n')
-            {
-                    cout<<" Por favor digite una respuesta correcta, s (si) ó n (no) "<<endl;
-                    cin>>respuesta2;
-            }
-    }while (respuesta2=='s');
     tem.close();
     return;
 }
