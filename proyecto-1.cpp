@@ -356,7 +356,6 @@ int main()
                                 encontrado = false;
                                 while(!usuarios.eof())
                                 {
-                                    //usuarios.read((char *)&registro,sizeof(registro));  //lectura del registro mediante estructura
                                     usuarios.read(registro.nombre,sizeof(registro.nombre));
                                     usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
                                     usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
@@ -367,14 +366,12 @@ int main()
                                     if(user==aux)  // buscar nuevamente la concidencia
                                     {
                                         encontrado=true;
-                                        direccion = usuarios.tellp();  //asignar la dirección actual en registros
+                                        direccion = usuarios.tellg();  //asignar la dirección actual en registros
                                         letra = 'b'; // cambio de letra para bloqueo de usuarios
                                         usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
-                                        //usuarios.seekp(ios::cur-(sizeof(registro.fecha)+sizeof(registro.cuenta)));
                                         registro.cuenta = letra; 
                                         usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
                                         break;
-                                        //TODO: Tarea pendiente--> Arreglar bloqueo
                                     }
                                 }
                             }
@@ -396,8 +393,8 @@ int main()
                 }
                 else
                     cout<<"Volviendo al menú...nHa ocurrido un error con el archivo de registrados..."<<endl;
-                //if(usuarios.is_open())
-                //    usuarios.close();
+                if(usuarios.is_open())
+                    usuarios.close();
                 break;
             case 2:
                 cout<<"Preparandose para crear un nuevo usuario..."<<endl;
@@ -639,7 +636,6 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
         con = 0;
         while(!busqueda.eof())  // mientras el archivo no termine
         {
-            //busqueda.read((char *)&enlista[con],sizeof(enlista[con]));  // lectura comprimida mediante la estructura en lista
             busqueda.read(enlista[con].nombre,sizeof(enlista[con].nombre));
             busqueda.read(enlista[con].contrasena,sizeof(enlista[con].contrasena));  //lectura de registros mediante estructuras
             busqueda.read((char *)&enlista[con].tipo,sizeof(enlista[con].tipo));
@@ -663,61 +659,64 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     busqueda.close();
     cout<<"Lectura completada..."<<endl;
     //Segunda o n apertura del archivo para el cambio de permiso mediante el nombre 
-    do
+    if(con>0)
     {
-        busqueda.open(nombre,ios::binary | ios::out | ios::in);
-        if(busqueda.is_open())
+        do
         {
-            cout<<"Digite un caso:\n1)Aceptar por nombre\n2)Pedir cambio por nombre\n3)Ignorar todo\n4)Salir"<<endl;
-            cin>>elec;
-            if(elec == 1 || elec == 2) // opcion de modificación
+            busqueda.open(nombre,ios::binary | ios::out | ios::in);
+            if(busqueda.is_open())
             {
-                cout<<"Digite el nombre a buscar: ";
-                cin>> hallar;  // nombre a buscar
-                hallado = false;
-                strcpy(conversor,hallar.c_str());
-                hallar = convertToString(conversor,ML);  // conversión a un arreglo de tamaño equivalente a la propiedad nombre de la estructura
-                while (!busqueda.eof())  // mientras el archivo no termine
+                cout<<"Digite un caso:\n1)Aceptar por nombre\n2)Pedir cambio por nombre\n3)Ignorar todo\n4)Salir"<<endl;
+                cin>>elec;
+                if(elec == 1 || elec == 2) // opcion de modificación
                 {
-                    //busqueda.read((char *)&enlista[con],sizeof(enlista[con]));  // lectura comprimida mediante la estructura en lista
-                    busqueda.read(temporal.nombre,sizeof(temporal.nombre));
-                    busqueda.read(temporal.contrasena,sizeof(temporal.contrasena));  //lectura de registros mediante estructuras
-                    busqueda.read((char *)&temporal.tipo,sizeof(temporal.tipo));
-                    busqueda.read((char *)&temporal.cuenta,sizeof(temporal.cuenta));
-                    busqueda.read(temporal.fecha,sizeof(temporal.fecha));
-                    nom = convertToString(temporal.nombre,ML); // conversión de nombre a string
-                    //cout<<nom<<"-"<<hallar<<endl;  // muestre aquí para verificar la comparación
-                    if(nom==hallar)  // comparación y validación para cambio
+                    cout<<"Digite el nombre a buscar: ";
+                    cin>> hallar;  // nombre a buscar
+                    hallado = false;
+                    strcpy(conversor,hallar.c_str());
+                    hallar = convertToString(conversor,ML);  // conversión a un arreglo de tamaño equivalente a la propiedad nombre de la estructura
+                    while (!busqueda.eof())  // mientras el archivo no termine
                     {
-                        cout<<"Encontrado"<<endl;
-                        hallado = true;
-                        dir = busqueda.tellg(); // guardado de posición para cambio
-                        busqueda.seekp(dir-(sizeof(temporal.fecha)+sizeof(temporal.cuenta)));  // ir a la posición para modificar el caracter de cuenta
-                        if(elec == 1)
+                        busqueda.read(temporal.nombre,sizeof(temporal.nombre));
+                        busqueda.read(temporal.contrasena,sizeof(temporal.contrasena));  //lectura de registros mediante estructuras
+                        busqueda.read((char *)&temporal.tipo,sizeof(temporal.tipo));
+                        busqueda.read((char *)&temporal.cuenta,sizeof(temporal.cuenta));
+                        busqueda.read(temporal.fecha,sizeof(temporal.fecha));
+                        nom = convertToString(temporal.nombre,ML); // conversión de nombre a string
+                        if(nom==hallar)  // comparación y validación para cambio
                         {
-                            temporal.cuenta = cambio;  // cambio dependendiendo de la ocasión ya sea desbloqueo o activación
-                            cout<<"Se ha valido el usuario: "<<nom<<endl;
+                            cout<<"Encontrado"<<endl;
+                            hallado = true;
+                            dir = busqueda.tellg(); // guardado de posición para cambio
+                            busqueda.seekp(dir-(sizeof(temporal.fecha)+sizeof(temporal.cuenta)));  // ir a la posición para modificar el caracter de cuenta
+                            if(elec == 1)
+                            {
+                                temporal.cuenta = cambio;  // cambio dependendiendo de la ocasión ya sea desbloqueo o activación
+                                cout<<"Se ha valido el usuario: "<<nom<<endl;
+                            }
+                            else
+                            {
+                                temporal.cuenta = 'c';  // petición de cambio de tipo
+                                cout<<"Se ha pedido un cambio al usuario: "<<nom<<endl;
+                            }
+                            busqueda.write((char *)&temporal.cuenta,sizeof(temporal.cuenta));  // actualización del permiso
                         }
-                        else
-                        {
-                            temporal.cuenta = 'c';  // petición de cambio de tipo
-                            cout<<"Se ha pedido un cambio al usuario: "<<nom<<endl;
-                        }
-                        busqueda.write((char *)&temporal.cuenta,sizeof(temporal.cuenta));  // actualización del permiso
                     }
                 }
+                else if (elec==3)
+                    cout<<"Se han ignorado todos los usuarios, se preguntará por ellos despues, saliendo..."<<endl;
+                else if(elec== 4)
+                    cout<<"Saliendo con los cambios realizados..."<<endl;
+                else
+                    cout<<"Volviendo a desplegar el menu..."<<endl;
             }
-            else if (elec==3)
-                cout<<"Se han ignorado todos los usuarios, se preguntará por ellos despues, saliendo..."<<endl;
-            else if(elec== 4)
-                cout<<"Saliendo con los cambios realizados..."<<endl;
             else
-                cout<<"Volviendo a desplegar el menu..."<<endl;
-        }
-        else
-            cout<<"Ha ocurrido un problmea con las asignación..."<<endl; // mensaje de error en caso de apertura del archivo
-        busqueda.close();
-    } while (elec!=3 && elec!=4);  // hacer mientras no se indique lo contrario
+                cout<<"Ha ocurrido un problmea con las asignación..."<<endl; // mensaje de error en caso de apertura del archivo
+            busqueda.close();
+        } while (elec!=3 && elec!=4);  // hacer mientras no se indique lo contrario
+    }
+    else
+        cout<<"No hay usuarios que cumplan la condición en la lista de espera..."<<endl;
     return;
 }
 void Realizar_una_compra (productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion, string necesario)
@@ -1306,5 +1305,5 @@ productos ordenar_precio_m_M (string archivo, productos produc)
     cout<<produc.codigo<<endl;
     archivoproducto(inventario,produc);
 
-   tem.close();
+    tem.close();
 }*/
