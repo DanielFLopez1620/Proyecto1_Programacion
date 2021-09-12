@@ -57,13 +57,14 @@ productos ordenar_precio_m_M (string archivo, productos produc);
 int buscarcodigo(productos produc,string inventario);  // buscar un producto en archivo mediante su código
 void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicaciones[],char cambio);  // función para el cambio de permisos de usuarios
 void Realizar_una_compra(productos produc, string inventario, recibo compras[], string recibos, Factura Factu, long direccion, string necesario);
-void Cancelar_una_compra(productos produc, string inventario, string recibos, Factura Factu, long direccion);
-void Valor_total_de_compra(string recibos, Factura Factu);
-void Cantidad_de_productos (string recibos, Factura Factu);
-void Total_de_ventas(productos produc, string inventario);
-void Producto_mas_vendido(string recibos, Factura Factu, recibo compras[]);
-void lista_clientes(string archivo,int orden);
-void bloqueo(personal registro,string nombre,string aux);
+void Cancelar_una_compra(productos produc, string inventario, string recibos, Factura Factu, long direccion);  // función para cancelar una factura
+void Valor_total_de_compra(string recibos, Factura Factu);  // función para el calculo de total a pagar por un cliente
+void Cantidad_de_productos (string recibos, Factura Factu); //función para el mostrado y cantidad de productos
+void Total_de_ventas(productos produc, string inventario);  //calcula el total de ventas de productos
+void Producto_mas_vendido(string recibos, Factura Factu, recibo compras[]);  //función que itera opr las facturas para ver el producto más vendido
+void lista_clientes(string archivo,int orden);  //retorna una lista de los clientes activos
+void bloqueo(personal registro,string nombre,string aux);  //función para bloquear a un usuario que digita incorrectamente su contraseña
+void cambio_factura(string factura);  //función para la validación y el despacho de facturas por parte del admin
 //--DESARROLLO DEL MAIN----------------------------------------------------------------------------------------------------------------------
 int main()
 {
@@ -234,6 +235,9 @@ int main()
                                                 break;
                                             case 5:
                                                 cout<<"Abriendo la función de despacho de compras..."<<endl;
+                                                cout<<"Accediendo a la validación..."<<endl;
+                                                cambio_factura(recibos);
+                                                cout<<"Guardando cambios..."<<endl;
                                                 break;
                                             case 6:
                                                 cout<<"Saliendo de la sesión..."<<endl;
@@ -390,37 +394,7 @@ int main()
                         }
                         else  // else en caso de bloque de usuario
                         {
-                            cout<<"Contraseña digitada incorrectamente 3 veces, se bloqueo el usuario..."<<endl;
-                            /*user = convertToString(registro.nombre,ML);
-                            usuarios.open(nombre,ios::binary | ios::out | ios::in);  // abrir archivo en los tres modos
-                            if(usuarios.is_open())
-                            {
-                                encontrado = false;
-                                while(!usuarios.eof())
-                                {
-                                    usuarios.read(registro.nombre,sizeof(registro.nombre));
-                                    usuarios.read(registro.contrasena,sizeof(registro.contrasena));  //lectura de registros mediante estructuras
-                                    usuarios.read((char *)&registro.tipo,sizeof(registro.tipo));
-                                    usuarios.read((char *)&registro.cuenta,sizeof(registro.cuenta));
-                                    usuarios.read(registro.fecha,sizeof(registro.fecha));
-                                    strcpy(buscado,aux.c_str());  // conversión de apoyo
-                                    aux = convertToString(buscado,ML);  // paso a string para mejor comparación
-                                    if(user==aux)  // buscar nuevamente la concidencia
-                                    {
-                                        encontrado=true;
-                                        direccion = usuarios.tellg();  //asignar la dirección actual en registros
-                                        letra = 'b'; // cambio de letra para bloqueo de usuarios
-                                        usuarios.seekp(direccion-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
-                                        registro.cuenta = letra; 
-                                        usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                                cout<<"Ha ocurrido un problema la bloquear al usuario"<<endl;
-                            cout<<"Su usuario ha sido bloqueado, contacte al admin en caso de requerir desbloque"<<endl;
-                            usuarios.close();*/
+                            //función de bloque de usuario
                             bloqueo(registro,nombre,aux);
                         }
                     }
@@ -586,7 +560,6 @@ void crear_producto(productos produc,string inventario)
     char tempo={' '};
     bool veri;
     string auxiliar, seleccion;
-   
     tem.open(inventario.c_str(), ios::binary | ios::in);
             if(tem.is_open())
             {
@@ -597,27 +570,27 @@ void crear_producto(productos produc,string inventario)
                 strcpy(apoyo, auxiliar.c_str());
                 auxiliar=convertToString(apoyo,ML);
                 while (!tem.eof()){}
-                
                     seleccion=convertToString(produc.nombre,ML);
                     if(auxiliar!=seleccion)
                     {
                         tem.seekg(0,ios::end);
                         strcpy(produc.nombre,auxiliar.c_str());
-                        
-                           do{
-                                menu_categorias();
-                                cout<<"Ingrese la categoria del producto: "<<endl;
-                                cin>>tempo;
-
-                                if(tempo=='L' || tempo=='A' || tempo=='F' || tempo=='D' || tempo=='C' || tempo=='P' || tempo=='B' || tempo=='H' || tempo=='S' || tempo=='W' || tempo=='T'){
+                        do
+                        {
+                            menu_categorias();
+                            cout<<"Ingrese la categoria del producto: "<<endl;
+                            cin>>tempo;
+                            if(tempo=='L' || tempo=='A' || tempo=='F' || tempo=='D' || tempo=='C' || tempo=='P' || tempo=='B' || tempo=='H' || tempo=='S' || tempo=='W' || tempo=='T')
+                            {
                                 veri=true;
                                 produc.categoria=tempo;
-                                }
-                                else{
+                            }
+                            else
+                            {
                                 veri=false;
                                 cout<<"categoria no encontrada, vuelva a escribirla: "<<endl;
-                                }
-                                }while(veri==false);
+                            }
+                        }while(veri==false);
                         cout<<"Ingrese el precio: "<<endl;
                         cin>>produc.precio;
                         cout<<"Ingrese la disponibilidad del producto: "<<endl;
@@ -701,7 +674,6 @@ productos ordenaralf (string archivo, productos produc)
     num=i-1;
     cout<<num;
     tem.close();
-
     tem.open(archivo,ios::binary | ios::in);
     productos tempo[num], tep, terr;
     int codigo[num];
@@ -719,15 +691,13 @@ productos ordenaralf (string archivo, productos produc)
         n=n+1;
     }
     tem.close();
-
-
-    for (int j=0; j<num;j++){
-        for (int k=j+1;k<num;k++){
-
+    for (int j=0; j<num;j++)
+    {
+        for (int k=j+1;k<num;k++)
+        {
             // strcoll() devuelve -1 si el 1º parametro es mayor que el 2º, 0 si el 1º es igual al 2º, o
             //1 si el 1º mayor que el 2º. Lo hace caracter a caracter hasta encontrar una diferencia o un nulo que es cuando retorna uno de los valores mensionados.
             if ( ( strcoll(/*1º*/ tempo[j].nombre, /*2º*/tempo[k].nombre))>0) {
-
                 //esto va subiendo los nombres a la cabeza de la lista
                 strcpy ( tep.nombre, tempo[j].nombre );
                 strcpy ( tempo[j].nombre, tempo[k].nombre );
@@ -735,15 +705,12 @@ productos ordenaralf (string archivo, productos produc)
             }
         }
     }
-
-     cout << "los productor ordenados son: "<<endl;
-    for ( int m=0; m<num;m++){
-
+    cout << "los productor ordenados son: "<<endl;
+    for ( int m=0; m<num;m++)
+    {
         cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
         cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
     }
-
-
     tem.close();
     return ejemplo;
 }
@@ -772,7 +739,7 @@ productos ordenar_precio_M_m (string archivo, productos produc)
     tem.open(archivo,ios::binary | ios::in);
     productos tempo[num], tep, terr;
     int codigo[num];
-      while(!tem.eof())
+    while(!tem.eof())
     {
         tem.seekg((n)*sizeof(produc));
         tem.read((char *) &produc,sizeof(produc));
@@ -788,7 +755,7 @@ productos ordenar_precio_M_m (string archivo, productos produc)
     tem.close();
 
 
-   int aux;
+    int aux;
     for(int j=0; j<num-1; j++)
     {
         for(int k=0; k<num-j-1; k++)
@@ -803,7 +770,7 @@ productos ordenar_precio_M_m (string archivo, productos produc)
         }
     }
 
-     cout << "los productor ordenados son: "<<endl;
+    cout << "los productor ordenados son: "<<endl;
     for ( int m=0; m<num;m++){
 
         cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
@@ -835,11 +802,10 @@ productos ordenar_precio_m_M (string archivo, productos produc)
     num=i-1;
     cout<<num;
     tem.close();
-
     tem.open(archivo,ios::binary | ios::in);
     productos tempo[num], tep, terr;
     int codigo[num];
-      while(!tem.eof())
+    while(!tem.eof())
     {
         tem.seekg((n)*sizeof(produc));
         tem.read((char *) &produc,sizeof(produc));
@@ -853,9 +819,7 @@ productos ordenar_precio_m_M (string archivo, productos produc)
         n=n+1;
     }
     tem.close();
-
-
-   int aux;
+    int aux;
     for(int j=0; j<num-1; j++)
     {
         for(int k=0; k<num-j-1; k++)
@@ -870,7 +834,7 @@ productos ordenar_precio_m_M (string archivo, productos produc)
         }
     }
 
-     cout << "los productor ordenados son: "<<endl;
+    cout << "los productor ordenados son: "<<endl;
     for ( int m=0; m<num;m++){
 
         cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
@@ -912,12 +876,12 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             ubicaciones[con] = busqueda.tellg(); // guardado de posición para cambio
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
             {
-                cout<<endl<<"Nombre: "<<enlista[con].nombre<<endl;
+                /*cout<<endl<<"Nombre: "<<enlista[con].nombre<<endl;
                 cout<<"Contraseña: *******"<<endl; //No se despliega la contraseña puesto que es privada
                 cout<<"Tipo: "<<enlista[con].tipo<<endl;
                 cout<<"Cuenta: "<<enlista[con].cuenta<<endl;
                 cout<<"Creación: "<<enlista[con].fecha<<endl;
-                cout<<endl;
+                cout<<endl;*/
                 con++;  // contador de coincidencias
             }
         }
@@ -929,6 +893,15 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
     //Segunda o n apertura del archivo para el cambio de permiso mediante el nombre 
     if(con>0)
     {
+        for(int j=0;j<con-1;j++)
+        {
+            cout<<endl<<"Nombre: "<<enlista[j].nombre<<endl;
+            cout<<"Contraseña: *******"<<endl; //No se despliega la contraseña puesto que es privada
+            cout<<"Tipo: "<<enlista[j].tipo<<endl;
+            cout<<"Cuenta: "<<enlista[j].cuenta<<endl;
+            cout<<"Creación: "<<enlista[j].fecha<<endl;
+            cout<<endl;
+        }
         do
         {
             busqueda.open(nombre,ios::binary | ios::out | ios::in);
@@ -1480,18 +1453,71 @@ void bloqueo(personal registro,string nombre,string aux)
             if(user==aux)  // buscar nuevamente la concidencia
             {
                 encontrado=true;
-                //direccion = usuarios.tellg();  //asignar la dirección actual en registros
                 letra = 'b'; // cambio de letra para bloqueo de usuarios
                 usuarios.seekp(usuarios.tellp()-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
-                registro.cuenta = letra; 
+                registro.cuenta = letra; //actualización de permiso
                 usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
+                cout<<"Su usuario ha sido bloqueado, contacte al admin en caso de requerir desbloque"<<endl;
                 break;
             }
         }
     }
     else
         cout<<"Ha ocurrido un problema la bloquear al usuario"<<endl;
-    cout<<"Su usuario ha sido bloqueado, contacte al admin en caso de requerir desbloque"<<endl;
     usuarios.close();
+    return;
+}
+void cambio_factura(string factura)
+{
+    fstream despacho;
+    Factura impresos[ML];
+    int con=0,el,cod;
+    string aux1, aux2;
+    despacho.open(factura,ios::binary | ios::in);
+    if(despacho.is_open())
+    {
+        while(!despacho.eof())
+        {
+            despacho.read((char *)&impresos[con],sizeof(impresos[con]));
+            if(impresos[con].estado_de_compra && !impresos[con].estado_de_orden)
+                con++; // contador para la búsqueda de nuevos casos y coincidencias
+        }
+    }
+    else
+        cout<<"Se ha generado un problema al acceder al hisotiral de compras..."<<endl;
+    despacho.close();
+    for(int i=0;i<con-1;i++)
+    {
+        aux1 = convertToString(impresos[i].nombre,ML);
+        cout<<"-------------------------------------------------------------------"<<endl;
+        cout<<"Nombre: "<<aux1<<"\nCódigo de compra: "<<impresos[i].num_factu<<endl;
+        cout<<"Total a pagar: "<<impresos[i].precio_total<<"Estado de despacho: En espera"<<endl;  //mostrado de facturas sin validar
+    }
+    cout<<"-------------------------------------------------------------------"<<endl;
+    do  // ciclo de validación
+    {
+        con = 0;
+        despacho.open(factura,ios::binary | ios::out | ios::in);  // apertura del archivo en los tres modos
+        cout<<"Digite el código de la factura a validar: ";
+        cin>>cod;
+        if(despacho.is_open())
+        {
+            while(!despacho.eof()) //lectura mientras no se llegue al final del archivo
+            {
+                despacho.read((char *)&impresos[con],sizeof(impresos[con]));
+                if(cod == impresos[con].num_factu)  //búsqueda del código a validar
+                {
+                    despacho.seekp(despacho.tellg()-sizeof(impresos[con].estado_de_compra));  // ubicar el puntero correctamente para el cambio
+                    impresos[con].estado_de_compra = true;
+                    despacho.write((char *)&impresos[con].estado_de_compra,sizeof(impresos[con].estado_de_compra));  // actualización del registro
+                }
+            }
+        }
+        else
+            cout<<"Ha ocurrido un problema con la validación del pago"<<endl;
+        despacho.close(); // cierre
+        cout<<"Si desea validar otro, digite 1, para salir digite otra opción: "<<endl;
+        cin>> el;  // lectura de opción
+    }while(el==1);
     return;
 }
