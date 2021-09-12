@@ -47,6 +47,7 @@ void menu_general();  // función para desplegar el menú inicial
 void menu_admin();   // función para desplegar el menú específico del administrador
 void menu_client();  // función que muestra el menú del cliente
 void menu_consul();  // fucnión que muestra las opciones para el consultor
+void menu_categorias();
 void crear_producto(productos produc,string inventario);  // función para crear productos en inventario
 void archivoproducto (string inventario, productos produc);  // función para...
 string convertToString(char* arreglo, int size);  // función de manejo de cadenas, paso de vecotr char a string
@@ -178,6 +179,7 @@ int main()
                                             case 3:
                                                 cout<<"Abriendo función de administrar categorías..."<<endl;
                                                 cout<<"Mostrando las categorías ya creadas..."<<endl;
+                                                menu_categorias();
                                                 break;
                                             case 4:
                                                 cout<<"Abriendo función de administrar productos..."<<endl;
@@ -531,7 +533,8 @@ void menu_consul()   // menu del consultor
     cout<<"*********************************"<<endl;
     return;  //return final
 }
-void menu_categorias(){
+void menu_categorias()
+{
 
     cout<<"*********************************"<<endl;
     cout<<"*     OPCIONES DE categorias    *"<<endl;
@@ -716,11 +719,10 @@ productos ordenaralf (string archivo, productos produc)
 }
 productos ordenar_precio_M_m (string archivo, productos produc)
 {
-    productos ejemplo;  //borrar para después
     int i=0, n=0, p=0, num;
+    productos tep, terr,aux,ejemplo;
     string nombre="";
     fstream tem;
-
     tem.open(archivo,ios::binary | ios::in);
     while(!tem.eof())
     {
@@ -735,9 +737,8 @@ productos ordenar_precio_M_m (string archivo, productos produc)
     num=i-1;
     cout<<num;
     tem.close();
-
+    productos tempo[num];
     tem.open(archivo,ios::binary | ios::in);
-    productos tempo[num], tep, terr;
     int codigo[num];
     while(!tem.eof())
     {
@@ -745,7 +746,6 @@ productos ordenar_precio_M_m (string archivo, productos produc)
         tem.read((char *) &produc,sizeof(produc));
         if(tem.good())
         {
-
         tempo[n]=produc;
         codigo[n]=produc.codigo;
         tempo[n].codigo=codigo[n];
@@ -753,9 +753,6 @@ productos ordenar_precio_M_m (string archivo, productos produc)
         n=n+1;
     }
     tem.close();
-
-
-    int aux;
     for(int j=0; j<num-1; j++)
     {
         for(int k=0; k<num-j-1; k++)
@@ -766,28 +763,23 @@ productos ordenar_precio_M_m (string archivo, productos produc)
                 tempo[k]=tempo[k+1];
                 tempo[k+1]= aux;
             }
-
         }
     }
-
     cout << "los productor ordenados son: "<<endl;
-    for ( int m=0; m<num;m++){
-
-        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
+    for ( int m=0; m<num;m++)
+    {
+        cout<<"Nombre "<< tempo[m].nombre<<"\nCategoria: "<< tempo[m].categoria <<"\nPrecio "<<tempo[m].precio <<"\nDisponibilidad "<<tempo[m].disponibilidad<<endl;
         cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
     }
-
-
     tem.close();
     return ejemplo;
 }
 productos ordenar_precio_m_M (string archivo, productos produc)
 {
-    productos ejemplo;  //borrar para después
+    productos ejemplo, tep, terr,aux;  //borrar para después
     int i=0, n=0, p=0, num;
     string nombre="";
     fstream tem;
-
     tem.open(archivo,ios::binary | ios::in);
     while(!tem.eof())
     {
@@ -803,7 +795,7 @@ productos ordenar_precio_m_M (string archivo, productos produc)
     cout<<num;
     tem.close();
     tem.open(archivo,ios::binary | ios::in);
-    productos tempo[num], tep, terr;
+    productos tempo[num];
     int codigo[num];
     while(!tem.eof())
     {
@@ -811,15 +803,13 @@ productos ordenar_precio_m_M (string archivo, productos produc)
         tem.read((char *) &produc,sizeof(produc));
         if(tem.good())
         {
-
-        tempo[n]=produc;
-        codigo[n]=produc.codigo;
-        tempo[n].codigo=codigo[n];
+            tempo[n]=produc;
+            codigo[n]=produc.codigo;
+            tempo[n].codigo=codigo[n];
         }
         n=n+1;
     }
     tem.close();
-    int aux;
     for(int j=0; j<num-1; j++)
     {
         for(int k=0; k<num-j-1; k++)
@@ -830,14 +820,11 @@ productos ordenar_precio_m_M (string archivo, productos produc)
                 tempo[k]=tempo[k+1];
                 tempo[k+1]= aux;
             }
-
         }
     }
-
     cout << "los productor ordenados son: "<<endl;
     for ( int m=0; m<num;m++){
-
-        cout<<"nombre "<< tempo[m].nombre<<" categoria: "<< tempo[m].categoria <<" precio "<<tempo[m].precio <<" disponibilidad "<<tempo[m].disponibilidad<<endl;
+        cout<<"Nombre: "<< tempo[m].nombre<<"\ncategoria: "<< tempo[m].categoria <<"\nprecio: "<<tempo[m].precio <<"\ndisponibilidad: "<<tempo[m].disponibilidad<<endl;
         cout<<" codigo "<<tempo[m].codigo<<" "<<endl;
     }
 
@@ -875,15 +862,7 @@ void cambios_cuenta(string nombre,personal enlista[],char letra, long ubicacione
             busqueda.read(enlista[con].fecha,sizeof(enlista[con].fecha));
             ubicaciones[con] = busqueda.tellg(); // guardado de posición para cambio
             if(enlista[con].cuenta==letra)  // si hay coincidencia de permiso, se va a la siguiente posición
-            {
-                /*cout<<endl<<"Nombre: "<<enlista[con].nombre<<endl;
-                cout<<"Contraseña: *******"<<endl; //No se despliega la contraseña puesto que es privada
-                cout<<"Tipo: "<<enlista[con].tipo<<endl;
-                cout<<"Cuenta: "<<enlista[con].cuenta<<endl;
-                cout<<"Creación: "<<enlista[con].fecha<<endl;
-                cout<<endl;*/
                 con++;  // contador de coincidencias
-            }
         }
     }
     else
@@ -1436,9 +1415,10 @@ void bloqueo(personal registro,string nombre,string aux)
     string user;
     char buscado[ML]= {' '},letra;
     bool encontrado = false;
+    long direccion;
     cout<<"Contraseña digitada incorrectamente 3 veces, se bloqueo el usuario..."<<endl;
     user = convertToString(registro.nombre,ML);
-    usuarios.open(nombre,ios::binary | ios::out | ios::in);  // abrir archivo en los tres modos
+    usuarios.open(nombre,ios::binary|ios::in);  // abrir archivo en los tres modos
     if(usuarios.is_open())
     {
         while(!usuarios.eof())
@@ -1454,10 +1434,12 @@ void bloqueo(personal registro,string nombre,string aux)
             {
                 encontrado=true;
                 letra = 'b'; // cambio de letra para bloqueo de usuarios
-                usuarios.seekp(usuarios.tellp()-(sizeof(registro.fecha)+sizeof(registro.cuenta)));   //mover puntero al aspecto para cuenta
+                direccion = usuarios.tellg()-(sizeof(registro.fecha)+sizeof(registro.cuenta));   //mover puntero al aspecto para cuenta
                 registro.cuenta = letra; //actualización de permiso
+                usuarios.seekp(direccion);
                 usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
-                cout<<"Su usuario ha sido bloqueado, contacte al admin en caso de requerir desbloque"<<endl;
+                cout<<"Su usuario ha sido bloqueado, contacte al admin en caso de requerir desbloqueo"<<endl;
+                cout<<"Realizando cambios..."<<endl;
                 break;
             }
         }
@@ -1465,6 +1447,15 @@ void bloqueo(personal registro,string nombre,string aux)
     else
         cout<<"Ha ocurrido un problema la bloquear al usuario"<<endl;
     usuarios.close();
+    /*usuarios.open(nombre,ios::binary | ios::out);
+    if(usuarios.is_open())
+    {
+        registro.cuenta = letra; //actualización de permiso
+        usuarios.seekp(direccion);
+        usuarios.write((char *)&registro.cuenta,sizeof(registro.cuenta)); // reasignación de bloqueo
+        cout<<"Su usuario ha sido bloqueado, contacte al admin en caso de requerir desbloqueo"<<endl;
+    }  
+    usuarios.close();*/
     return;
 }
 void cambio_factura(string factura)
