@@ -699,9 +699,9 @@ productos ordenaralf (string archivo, productos produc)
             //1 si el 1º mayor que el 2º. Lo hace caracter a caracter hasta encontrar una diferencia o un nulo que es cuando retorna uno de los valores mensionados.
             if ( ( strcoll(/*1º*/ tempo[j].nombre, /*2º*/tempo[k].nombre))>0) {
                 //esto va subiendo los nombres a la cabeza de la lista
-                strcpy ( tep.nombre, tempo[j].nombre );
-                strcpy ( tempo[j].nombre, tempo[k].nombre );
-                strcpy ( tempo[k].nombre, tep.nombre );
+                tep=tempo[j];
+                tempo[j]=tempo[k];
+                tempo[k]=tep;
             }
         }
     }
@@ -762,9 +762,9 @@ productos ordenar_precio_M_m (string archivo, productos produc)
         {
             if(tempo[k].precio>tempo[k+1].precio)
             {
-                aux = tempo[k].precio;
-                tempo[k].precio=tempo[k+1].precio;
-                tempo[k+1].precio= aux;
+                aux = tempo[k];
+                tempo[k]=tempo[k+1];
+                tempo[k+1]= aux;
             }
 
         }
@@ -826,9 +826,9 @@ productos ordenar_precio_m_M (string archivo, productos produc)
         {
             if(tempo[k].precio<tempo[k+1].precio)
             {
-                aux = tempo[k].precio;
-                tempo[k].precio=tempo[k+1].precio;
-                tempo[k+1].precio= aux;
+                aux = tempo[k];
+                tempo[k]=tempo[k+1];
+                tempo[k+1]= aux;
             }
 
         }
